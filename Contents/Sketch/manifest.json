@@ -1,49 +1,41 @@
 {
-  "name": "Sketch Palettes",
-  "description": "Plugin to load palettes into color picker",
-  "author": "Andrew Fiorillo",
-  "homepage": "http://github.com/andrewfiorillo/sketch-palettes",
-  "version": 1.0,
-  "identifier": "com.andrewfiorillo.sketch.sketch-palettes",
-  "compatibleVersion": 3,
-  "bundleVersion": 1,
-  "commands": [
-    {
-      "name": "Load Palette",
-      "identifier": "loadPalette",
-      "shortcut": "",
-      "script": "sketchPalettes.js",
-      "handler": "loadPalette"
-    },
-    {
-      "name": "Clear Palette",
-      "identifier": "clearPalette",
-      "shortcut": "",
-      "script": "sketchPalettes.js",
-      "handler": "clearPalette"
-    },
-    {
-      "name": "OkCupid Palette",
-      "identifier": "okcupidPalette",
-      "shortcut": "",
-      "script": "sketchPalettes.js",
-      "handler": "okcupidPalette"
-    },
-    {
-      "name": "Test",
-      "identifier": "test",
-      "shortcut": "",
-      "script": "sketchPalettes.js",
-      "handler": "test"
-    }
-    
-  ],
-  "menu": {
-    "items": [
-      "loadPalette",
-      "clearPalette",
-      "okcupidPalette",
-      "test"
-    ]
-  }
+	"name": "Sketch Palettes",
+	"description": "Plugin to load palettes into color picker",
+	"author": "Andrew Fiorillo",
+	"homepage": "http://github.com/andrewfiorillo/sketch-palettes",
+	"version": 1.0,
+	"identifier": "com.andrewfiorillo.sketch.sketch-palettes",
+	"compatibleVersion": 3,
+	"bundleVersion": 1,
+	"commands": [
+		{
+			"name": "Load Palette...",
+			"identifier": "loadPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "loadPalette"
+		},
+		{
+			"name": "Clear Palette",
+			"identifier": "clearPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "clearPalette"
+		},
+		{
+			"name": "OkCupid Palette",
+			"identifier": "okcupidPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "okcupidPalette"
+		}
+	],
+	"menu": {
+		"items": [
+			"loadPalette",
+			"clearPalette",
+			"okcupidPalette",
+			"test"
+		]
+	}
 }
