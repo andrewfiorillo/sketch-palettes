@@ -12,29 +12,38 @@
       "name": "Load Palette",
       "identifier": "loadPalette",
       "shortcut": "",
-      "script": "loadPalette.js",
+      "script": "sketchPalettes.js",
       "handler": "loadPalette"
     },
     {
       "name": "Clear Palette",
       "identifier": "clearPalette",
       "shortcut": "",
-      "script": "loadPalette.js",
+      "script": "sketchPalettes.js",
       "handler": "clearPalette"
     },
     {
       "name": "OkCupid Palette",
       "identifier": "okcupidPalette",
       "shortcut": "",
-      "script": "loadPalette.js",
+      "script": "sketchPalettes.js",
       "handler": "okcupidPalette"
+    },
+    {
+      "name": "Test",
+      "identifier": "test",
+      "shortcut": "",
+      "script": "sketchPalettes.js",
+      "handler": "test"
     }
+    
   ],
   "menu": {
     "items": [
       "loadPalette",
       "clearPalette",
-      "okcupidPalette"
+      "okcupidPalette",
+      "test"
     ]
   }
 }
