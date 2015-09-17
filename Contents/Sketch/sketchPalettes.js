@@ -1,168 +1,49 @@
 
-function test(context) {
-	
-	var doc = context.document;
-	var plugin = context.plugin;
-	
-	var fileManager = NSFileManager.defaultManager();
-	var openPanel = [NSOpenPanel openPanel]
-	
-	[openPanel setCanChooseDirectories:true]
-	[openPanel setCanChooseFiles:true]
-	[openPanel setCanCreateDirectories:true]
-
-	[openPanel setDirectoryURL: [NSURL URLWithString:"~/Documents"]]
-
-	[openPanel setTitle:"Choose a file"]
-	[openPanel setPrompt:"Choose"]
-	[openPanel runModal]
-
-	var filePath = openPanel.URLs().firstObject().path();
-
-	log(filePath);
-
-	var fileContents = NSString.stringWithContentsOfFile(filePath);
-
-	// log(fileContents);
-	
-	var palette = fileContents.componentsSeparatedByString(",");
-	
-	log(palette.count());
-	
-	return;
-	
-	var mspalette = [];
-
-	for (var i = 0; i < palette.count(); i++) {
-		// log(palette[i].UTF8String())
-		mspalette.push(MSColor.colorWithSVGString(palette[i]));
-	};
-
-	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
-	
-	
-	// var fileData = fileContents.dataUsingEncoding(NSUTF8StringEncoding);
-	
-	// log(fileData);
-	
-	// var fileJson = [NSJSONSerialization JSONObjectWithData:fileData options:0 error:nil];
-	
-	// log(fileJson);
-
-	
-}
-
-
-// ------------------------------------------------------------------------------------------------------------------------
 
 
 function loadPalette(context) {
 	
 	var doc = context.document;
-	var plugin = context.plugin;
-	
-	
-	// var paletteContents = NSData.dataWithContentsOfFile(NSURL.URLWithString("~/Documents/test.sketchpalette"));
-	
-	// var pathString = NSString.stringWithUTF8String("~/Documents/test.sketchpalette");
-	
-	
-	// var content = [NSString stringWithContentsOfFile:"~/Documents/test.sketchpalette"];
-	
-
-	// var palette = ["#FF5757","#FFFFFF","#23D5D6"];
-
-
-	// log(sketch.scriptPath.stringByDeletingLastPathComponent());
-	// var dir = sketch.scriptPath.stringByDeletingLastPathComponent();
-
-
+	var mspalette = [];
 	var openPanel = NSOpenPanel.openPanel();
-
+	
 	openPanel.setCanChooseDirectories(true);
 	openPanel.setCanChooseFiles(true);
 	openPanel.setCanCreateDirectories(true);
-	
-	openPanel.setDirectoryURL(NSURL.URLWithString("~/Documents/"));
 	openPanel.setTitle("Choose a file");
-	openPanel.setPrompt("Choose")
+	openPanel.setPrompt("Choose");
+	// openPanel.setDirectoryURL(NSURL.URLWithString("~/Documents"))
 	
 	openPanel.runModal();
 	
-	var fileURLs = openPanel.URLs();
+	// Gte filepath to file selected
+	var filePath = openPanel.URLs().firstObject().path();
 	
-	if (fileURLs.count() > 0) {
-		var filePath = fileURLs.firstObject().path();
-		log(filePath);
-	}
+	// Read contents of file into NSString
+	var fileContents = NSString.stringWithContentsOfFile(filePath);
 	
-	// var filePath = openPanel.URLs().firstObject().path();
+	// Get NSArray of colors
+	var palette = fileContents.componentsSeparatedByString(",");
 	
-	// log(filePath);
-	
-	// [openPanel setDirectoryURL:pluginDir]
 
-	// [openPanel setDirectoryURL: [NSURL URLWithString:pluginDir]]
-	// openPanel.setDirectoryURL(NSURL.fileURLWithPath("~/Documents/"));
-
-
-	// var filePath = openPanel.URLs().firstObject().path();
-
-	// log(filePath)
-
-	// var fileContents = NSString.stringWithContentsOfFile(filePath);
-	// var fileContents = NSDictionary.dictionaryWithContentsOfFile(filePath)
-
-	// var txtFileContents = [NSString stringWithContentsOfFile:txtFilePath encoding:NSUTF8StringEncoding error:NULL];
-	// var fileContents = NSString.stringWithContentsOfFile(filePath);
-
-	// var fileData = fileContents.dataUsingEncoding(NSUTF8StringEncoding);
-
-	// var fileArray = MSArray.dataArrayWithArray(fileContents);
-
-
-
-
-	// var jSonData = NSData.dataWithContentsOfURL(NSURL.URLWithString(filePath));
-	// var jSonData = NSData.dataWithContentsOfURL(filePath);
-
-	// var palette = fileContents.split(",");
-
-	
-	return;
-
-
-
-	var palette = [
-		'#000000',
-		'#ffffff'
-	];
-
-	var mspalette = [];
-
-	for (var i = 0; i < palette.length; i++) {
-		mspalette.push(MSColor.colorWithSVGString(palette[i]));
+	for (var i = 0; i < palette.count(); i++) {
+		
+		// Get hex string from NSString
+		var simpleColor = palette[i].toString();
+		
+		// Convert hex string to MSColor
+		var mscolor = MSColor.colorWithSVGString(palette[i]);
+		
+		// Add MSColor to palette array
+		mspalette.push(mscolor);
+		
 	};
-
-	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
-
-
-}
-
-
-// ------------------------------------------------------------------------------------------------------------------------
-
-
-function fillPalette(context, palette) {
-	var doc = context.document;
-	// var palette = [];
-	var mspalette = [];
-
-	for (var i = 0; i < palette.length; i++) {
-		mspalette.push(MSColor.colorWithSVGString(palette[i]));
-	};
-
-	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
+	
+	// Convert array into MSArray
+	var documentColors = MSArray.dataArrayWithArray(mspalette);
+	
+	// Load colors into Sketch Document Colors
+	doc.documentData().assets().setPrimitiveColors(documentColors);
 }
 
 
@@ -180,8 +61,6 @@ function clearPalette(context) {
 	};
 
 	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
-	
-	// fillPalette(context,[]);
 	
 }
 
@@ -257,4 +136,98 @@ function okcupidPalette(context) {
 	};
 
 	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
+}
+
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+
+function test(context) {
+	
+	
+	
+	
+	var myJson = '{ "fuck": "shit" }';
+	var myObject = JSON.parse(myJson);
+	log(myObject);
+	log(myObject.fuck);
+	log(typeof(myObject.fuck));
+	var dataToSave = JSON.stringify(myObject);
+	
+	
+	
+	
+	
+	return;
+	
+	var doc = context.document;
+	var plugin = context.plugin;
+	
+	var fileManager = NSFileManager.defaultManager();
+	var openPanel = [NSOpenPanel openPanel]
+	
+	[openPanel setCanChooseDirectories:true]
+	[openPanel setCanChooseFiles:true]
+	[openPanel setCanCreateDirectories:true]
+
+	// [openPanel setDirectoryURL: [NSURL URLWithString:"~/Documents"]]
+
+	[openPanel setTitle:"Choose a file"]
+	[openPanel setPrompt:"Choose"]
+	[openPanel runModal]
+	
+	if(openPanel.URLs()) {
+		
+		var filePath = openPanel.URLs().firstObject().path();
+
+		log(filePath);
+
+		var fileContents = NSString.stringWithContentsOfFile(filePath);
+
+		log(fileContents);
+		
+		var palette = fileContents.componentsSeparatedByString(",");
+		
+		log(palette.count());
+		
+	}
+	
+	
+	return;
+	
+	
+	
+	
+	
+	var mspalette = [];
+
+	for (var i = 0; i < palette.count(); i++) {
+		// log(palette[i].UTF8String())
+		mspalette.push(MSColor.colorWithSVGString(palette[i]));
+	};
+
+	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
+	
+	
+	// var fileData = fileContents.dataUsingEncoding(NSUTF8StringEncoding);
+	
+	// log(fileData);
+	
+	// var fileJson = [NSJSONSerialization JSONObjectWithData:fileData options:0 error:nil];
+	
+	// log(fileJson);
+	
+	
+	
+	// For manifest.json
+	//
+	// {
+	// 	"name": "Test",
+	// 	"identifier": "test",
+	// 	"shortcut": "",
+	// 	"script": "sketchPalettes.js",
+	// 	"handler": "test"
+	// }
+	
+	
 }
