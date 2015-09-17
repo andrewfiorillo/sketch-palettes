@@ -1,30 +1,59 @@
-function readData() {
+
+function test(context) {
+	
 	var doc = context.document;
 	var plugin = context.plugin;
 	
-	
-	
-	
-	var testPalette = {
-		
-		pluginVersion: "1",
-		
-		colors: ["000000","EEEEEE"]
-		
-	};
-	
-	
 	var fileManager = NSFileManager.defaultManager();
+	var openPanel = [NSOpenPanel openPanel]
+	
+	[openPanel setCanChooseDirectories:true]
+	[openPanel setCanChooseFiles:true]
+	[openPanel setCanCreateDirectories:true]
 
-	var path = NSString.alloc().initWithString("/Users/andrew/Documents/test.sketchpalette");
+	[openPanel setDirectoryURL: [NSURL URLWithString:"~/Documents"]]
 
-	var isFile = fileManager.fileExistsAtPath(path);
+	[openPanel setTitle:"Choose a file"]
+	[openPanel setPrompt:"Choose"]
+	[openPanel runModal]
+
+	var filePath = openPanel.URLs().firstObject().path();
+
+	log(filePath);
+
+	var fileContents = NSString.stringWithContentsOfFile(filePath);
+
+	// log(fileContents);
 	
-	log(isFile);
+	var palette = fileContents.componentsSeparatedByString(",");
+	
+	log(palette.count());
+	
+	return;
+	
+	var mspalette = [];
+
+	for (var i = 0; i < palette.count(); i++) {
+		// log(palette[i].UTF8String())
+		mspalette.push(MSColor.colorWithSVGString(palette[i]));
+	};
+
+	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
 	
 	
-	var content = [NSString stringWithContentsOfFile:path];
+	// var fileData = fileContents.dataUsingEncoding(NSUTF8StringEncoding);
+	
+	// log(fileData);
+	
+	// var fileJson = [NSJSONSerialization JSONObjectWithData:fileData options:0 error:nil];
+	
+	// log(fileJson);
+
+	
 }
+
+
+// ------------------------------------------------------------------------------------------------------------------------
 
 
 function loadPalette(context) {
@@ -94,15 +123,11 @@ function loadPalette(context) {
 
 
 
-
-
 	// var jSonData = NSData.dataWithContentsOfURL(NSURL.URLWithString(filePath));
 	// var jSonData = NSData.dataWithContentsOfURL(filePath);
 
 	// var palette = fileContents.split(",");
 
-	
-	
 	
 	return;
 
@@ -124,6 +149,10 @@ function loadPalette(context) {
 
 }
 
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+
 function fillPalette(context, palette) {
 	var doc = context.document;
 	// var palette = [];
@@ -136,6 +165,8 @@ function fillPalette(context, palette) {
 	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
 }
 
+
+// ------------------------------------------------------------------------------------------------------------------------
 
 
 function clearPalette(context) {
@@ -154,6 +185,8 @@ function clearPalette(context) {
 	
 }
 
+
+// ------------------------------------------------------------------------------------------------------------------------
 
 
 function okcupidPalette(context) {
