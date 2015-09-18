@@ -1,4 +1,3 @@
-@import 'sandbox.js'
 
 function loadPalette(context) {
 	
@@ -16,19 +15,14 @@ function loadPalette(context) {
 	// Get filepath to file selected
 	var filePath = openPanel.URLs().firstObject().path();
 	
-	// Read contents of file into NSString
+	// Read contents of file into NSString, then to JSON
 	var fileContents = NSString.stringWithContentsOfFile(filePath);
-	
-	// Convert file contents to JSON object
-	var fileJSON = JSON.parse(fileContents.toString());
-	
-	var palette = fileJSON.colors;
-	var mspalette = [];
+	var palette = JSON.parse(fileContents.toString()).colors;
 	
 	// Convert hex strings into MSColors
+	var mspalette = [];
 	for (var i = 0; i < palette.length; i++) {
-		var mscolor = MSColor.colorWithSVGString(palette[i]);
-		mspalette.push(mscolor);
+		mspalette.push(MSColor.colorWithSVGString(palette[i]));
 	};
 	
 	// Convert array into MSArray
@@ -57,12 +51,12 @@ function clearPalette(context) {
 }
 
 
-
-
 // ------------------------------------------------------------------------------------------------------------------------
 
 
 function savePalette(context) {
+	
+	@import 'sandbox.js'
 	
 	var doc = context.document;
 	var app = NSApplication.sharedApplication();
@@ -73,37 +67,42 @@ function savePalette(context) {
 	
 	
 	if (documentColors.count() > 0) {
+		
+		var savePanel = NSSavePanel.savePanel();
 	
-		// Convert MSArray into array
-		var mspalette = documentColors.array();
+	    savePanel.setAllowedFileTypes([@"sketchpalette"]);
+		savePanel.setNameFieldStringValue("untitled.sketchpalette");
+		savePanel.setAllowsOtherFileTypes(false);
 		
-		// Convert MSColors into hex strings
-		var palette = [];
-		for (var i = 0; i < mspalette.count(); i++) {
-			palette.push("#" + mspalette[i].hexValue());
-		};
+		if (savePanel.runModal()) {
+			
+			// Convert MSArray into array
+			var mspalette = documentColors.array();
+			
+			// Convert MSColors into hex strings
+			var palette = [];
+			for (var i = 0; i < mspalette.count(); i++) {
+				palette.push("#" + mspalette[i].hexValue());
+			};
+			
+			// Add colors and plugin version to palette object
+			var fileJSON = { "pluginVersion": version, "colors": palette }
+			
+			// Convert palette object into string
+			fileContents = JSON.stringify(fileJSON);
+			
+			//Write file contents to desktop
+			var fileString = [NSString stringWithString: fileContents]
+			var homeDir = @"/Users/" + NSUserName();
+			var filePath = savePanel.URL().path();
+			
+			new AppSandbox().authorize(homeDir, function() {
+				[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
+			});	
 		
-		// Add colors and plugin version to palette object
-		var fileJSON = {
-			"pluginVersion": version,
-			"colors": palette
+		} else {	
+			log("File save canceled");
 		}
-		
-		// Convert palette object into string
-		fileContents = JSON.stringify(fileJSON);
-		
-		// log(fileContents);
-		
-		
-		//Write file contents to desktop
-		
-		var fileString = [NSString stringWithString: fileContents]
-		var homeDir = @"/Users/" + NSUserName()
-		var filePath = homeDir + "/Desktop/okcupid.sketchpalette"]
-		
-		new AppSandbox().authorize(homeDir, function() {
-			[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
-		});
 		
 	} else {
 		
@@ -111,70 +110,4 @@ function savePalette(context) {
 		
 	}
 	
-	
-	
-	
-	
-	return;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	// Save text file to desktop
-	// Requires sandbox permissions
-	
-	var fileString = [NSString stringWithString: @"test"]
-	var homeDir = @"/Users/" + NSUserName()
-	var filePath = homeDir + "/Desktop/test.txt"]
-	
-	new AppSandbox().authorize(homeDir, function() {
-		[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
-	});
-	
-	return;
-	
-	var doc = context.document;
-	var app = NSApplication.sharedApplication();
-	var version = context.plugin.version().UTF8String();
-	
-	var savePanel = NSSavePanel.savePanel();
-	var fileType = NSString.stringWithString("sketchpalette");
-	
-	log(fileType.class());
-	
-	return;
-	
- 	// set the save panel to only do jpg and png file
-    savePanel.setAllowedFileTypes(NSArray.initWithObjects(fileType));
-    
- 	
-	savePanel.setNameFieldStringValue("untitled.sketchpalette");
-	savePanel.setAllowsOtherFileTypes(true);
-	// savePanel.setAllowedFileTypes(fileTypes);
-
-	
-	savePanel.runModal();
-	
-	// log(savePanel)
-	
-	// openPanel.setCanChooseDirectories(true);
-	// openPanel.setCanChooseFiles(true);
-	// openPanel.setCanCreateDirectories(true);
-	// openPanel.setTitle("Choose a file");
-	// openPanel.setPrompt("Choose");
-	// openPanel.runModal();
-	
-	
-	
-	return;
-	
 }
-
-
-
-
