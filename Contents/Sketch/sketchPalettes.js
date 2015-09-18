@@ -36,6 +36,62 @@ function loadPalette(context) {
 // ------------------------------------------------------------------------------------------------------------------------
 
 
+function savePalette(context) {
+	
+	@import 'sandbox.js'
+	
+	var doc = context.document;
+	var app = NSApplication.sharedApplication();
+	var version = context.plugin.version().UTF8String();
+	
+	// Get colors from Document Colors in color picker
+	var documentColors = doc.documentData().assets().primitiveColors();
+	
+	// Only run if there are colors
+	if (documentColors.count() > 0) {
+		
+		var savePanel = NSSavePanel.savePanel();
+	    savePanel.setAllowedFileTypes([@"sketchpalette"]);
+		savePanel.setNameFieldStringValue("untitled.sketchpalette");
+		savePanel.setAllowsOtherFileTypes(false);
+		
+		// Open save dialog and run if Save was clicked
+		if (savePanel.runModal()) {
+			
+			// Convert MSArray into array
+			var mspalette = documentColors.array();
+			
+			// Convert MSColors into hex strings
+			var palette = [];
+			for (var i = 0; i < mspalette.count(); i++) {
+				palette.push("#" + mspalette[i].hexValue());
+			};
+			
+			// Palette data
+			var fileJSON = { "pluginVersion": version, "colors": palette }
+			
+			// Convert palette data to string
+			fileContents = JSON.stringify(fileJSON);
+			
+			var fileString = NSString.stringWithString(fileContents);
+			var filePath = savePanel.URL().path();
+			
+			// Request permission to write for App Store version of Sketch
+			new AppSandbox().authorize(@"/Users/" + NSUserName(), function() {
+				// Write file to specified file path
+				[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
+			});	
+		
+		}
+		
+	} else { app.displayDialog("No colors in palette!"); }
+
+}
+
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+
 function clearPalette(context) {
 	
 	var doc = context.document;
@@ -50,64 +106,3 @@ function clearPalette(context) {
 	
 }
 
-
-// ------------------------------------------------------------------------------------------------------------------------
-
-
-function savePalette(context) {
-	
-	@import 'sandbox.js'
-	
-	var doc = context.document;
-	var app = NSApplication.sharedApplication();
-	var version = context.plugin.version().UTF8String();
-	
-	// Gte colors from Sketch Document Colors
-	var documentColors = doc.documentData().assets().primitiveColors();
-	
-	
-	if (documentColors.count() > 0) {
-		
-		var savePanel = NSSavePanel.savePanel();
-	
-	    savePanel.setAllowedFileTypes([@"sketchpalette"]);
-		savePanel.setNameFieldStringValue("untitled.sketchpalette");
-		savePanel.setAllowsOtherFileTypes(false);
-		
-		if (savePanel.runModal()) {
-			
-			// Convert MSArray into array
-			var mspalette = documentColors.array();
-			
-			// Convert MSColors into hex strings
-			var palette = [];
-			for (var i = 0; i < mspalette.count(); i++) {
-				palette.push("#" + mspalette[i].hexValue());
-			};
-			
-			// Add colors and plugin version to palette object
-			var fileJSON = { "pluginVersion": version, "colors": palette }
-			
-			// Convert palette object into string
-			fileContents = JSON.stringify(fileJSON);
-			
-			//Write file contents to desktop
-			var fileString = [NSString stringWithString: fileContents]
-			var homeDir = @"/Users/" + NSUserName();
-			var filePath = savePanel.URL().path();
-			
-			new AppSandbox().authorize(homeDir, function() {
-				[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
-			});	
-		
-		} else {	
-			log("File save canceled");
-		}
-		
-	} else {
-		
-		app.displayDialog("No colors in palette!");
-		
-	}
-	
-}
