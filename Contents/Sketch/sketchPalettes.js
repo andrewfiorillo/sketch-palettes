@@ -51,9 +51,10 @@ function savePalette(context) {
 	if (documentColors.count() > 0) {
 		
 		var savePanel = NSSavePanel.savePanel();
-	    savePanel.setAllowedFileTypes([@"sketchpalette"]);
 		savePanel.setNameFieldStringValue("untitled.sketchpalette");
+		savePanel.setAllowedFileTypes([@"sketchpalette"]);
 		savePanel.setAllowsOtherFileTypes(false);
+		savePanel.setExtensionHidden(false);
 		
 		// Open save dialog and run if Save was clicked
 		if (savePanel.runModal()) {
