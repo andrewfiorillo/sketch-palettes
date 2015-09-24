@@ -1,6 +1,6 @@
 # Sketch Palettes
 
-This plugin allows you to save, load, and remove color palettes in the color picker in Sketch.
+A Sketch plugin that lets you save and load colors into the color picker
 
 <img src="palettes.png" style="width: 100%; max-width:800px;" />
 
