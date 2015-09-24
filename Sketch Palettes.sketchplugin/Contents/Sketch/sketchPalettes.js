@@ -96,14 +96,7 @@ function savePalette(context) {
 function clearPalette(context) {
 	
 	var doc = context.document;
-	var palette = [];	
-	var mspalette = [];
-
-	for (var i = 0; i < palette.length; i++) {
-		mspalette.push(MSColor.colorWithSVGString(palette[i]));
-	};
-
-	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray(mspalette));
+	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
 	
 }
 
