@@ -4,9 +4,11 @@
 function loadColors(context, target) {
 	
 	var doc = context.document;
+	var app = NSApplication.sharedApplication();
 	var openPanel = NSOpenPanel.openPanel();
+	var version = context.plugin.version().UTF8String();
 	
-	// Open filepicker to choose palette file
+	// Open file picker to choose palette file
 	openPanel.setCanChooseDirectories(true);
 	openPanel.setCanChooseFiles(true);
 	openPanel.setCanCreateDirectories(true);
@@ -14,12 +16,19 @@ function loadColors(context, target) {
 	openPanel.setPrompt("Choose");
 	openPanel.runModal();
 	
-	// Get filepath to file selected
+	// Get file path to file selected
 	var filePath = openPanel.URLs().firstObject().path();
 	
 	// Read contents of file into NSString, then to JSON
 	var fileContents = NSString.stringWithContentsOfFile(filePath);
-	var palette = JSON.parse(fileContents.toString()).colors;
+	var paletteContents = JSON.parse(fileContents.toString());
+	var palette = paletteContents.colors;
+	var compatibleVersion = paletteContents.compatibleVersion;
+	
+	if (compatibleVersion && compatibleVersion > version) {
+		app.displayDialog("Your plugin out of date. Please update to the latest version of Sketch Palettes.");
+		return;
+	}
 	
 	// Convert hex strings into MSColors
 	var mspalette = [];
@@ -39,6 +48,8 @@ function loadColors(context, target) {
 	
 }
 
+
+//-------------------------------------------------------------------------------------------------------------
 
 
 // Save color palette
@@ -124,6 +135,9 @@ function clearDocumentPalette(context) {
 	var doc = context.document;
 	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
 }
+
+
+//-------------------------------------------------------------------------------------------------------------
 
 
 // Global Colors
