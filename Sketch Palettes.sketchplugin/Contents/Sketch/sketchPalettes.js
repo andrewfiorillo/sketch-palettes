@@ -1,5 +1,7 @@
 
-function loadPalette(context) {
+// Load color palette
+
+function loadColors(context, target) {
 	
 	var doc = context.document;
 	var openPanel = NSOpenPanel.openPanel();
@@ -26,17 +28,22 @@ function loadPalette(context) {
 	};
 	
 	// Convert array into MSArray
-	var documentColors = MSArray.dataArrayWithArray(mspalette);
+	var colors = MSArray.dataArrayWithArray(mspalette);
 	
-	// Load colors into Sketch Document Colors
-	doc.documentData().assets().setPrimitiveColors(documentColors);
+	// Load colors in target color picker section
+	if (target == "document") {
+		doc.documentData().assets().setPrimitiveColors(colors);	
+	} else if (target == "global" ) {
+		doc.inspectorController().globalAssets().setPrimitiveColors(colors);
+	}
+	
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------
 
+// Save color palette
 
-function savePalette(context) {
+function saveColors(context,target) {
 	
 	@import 'sandbox.js'
 	
@@ -44,12 +51,17 @@ function savePalette(context) {
 	var app = NSApplication.sharedApplication();
 	var version = context.plugin.version().UTF8String();
 	
-	// Get colors from Document Colors in color picker
-	var documentColors = doc.documentData().assets().primitiveColors();
+	// Get colors from target color picker section
+	if (target == "document") {
+		var colors = doc.documentData().assets().primitiveColors();
+	} else if (target == "global"){
+		var colors = doc.inspectorController().globalAssets().colors()	
+	}
 	
 	// Only run if there are colors
-	if (documentColors.count() > 0) {
+	if (colors.count() > 0) {
 		
+		// Save panel settings
 		var savePanel = NSSavePanel.savePanel();
 		savePanel.setNameFieldStringValue("untitled.sketchpalette");
 		savePanel.setAllowedFileTypes([@"sketchpalette"]);
@@ -60,7 +72,7 @@ function savePalette(context) {
 		if (savePanel.runModal()) {
 			
 			// Convert MSArray into array
-			var mspalette = documentColors.array();
+			var mspalette = colors.array();
 			
 			// Convert MSColors into hex strings
 			var palette = [];
@@ -69,12 +81,17 @@ function savePalette(context) {
 			};
 			
 			// Palette data
-			var fileJSON = { "pluginVersion": version, "colors": palette }
+			var fileJSON = {
+				"compatibleVersion": "1.0", // minimum plugin version required to load palette
+				"pluginVersion": version, // version of plugin used when saving
+				"colors": palette
+			}
 			
 			// Convert palette data to string
 			fileContents = JSON.stringify(fileJSON);
-			
 			var fileString = NSString.stringWithString(fileContents);
+			
+			// Get chosen file path
 			var filePath = savePanel.URL().path();
 			
 			// Request permission to write for App Store version of Sketch
@@ -82,7 +99,7 @@ function savePalette(context) {
 				// Write file to specified file path
 				[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
 			});	
-		
+
 		}
 		
 	} else { app.displayDialog("No colors in palette!"); }
@@ -90,13 +107,37 @@ function savePalette(context) {
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------
 
 
-function clearPalette(context) {
-	
+// Document Colors 
+
+function loadDocumentPalette(context) {
+	loadColors(context, "document");
+}
+
+function saveDocumentPalette(context) {
+	saveColors(context, "document");
+}
+
+function clearDocumentPalette(context) {	
 	var doc = context.document;
 	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
-	
+}
+
+
+// Global Colors
+
+function loadGlobalPalette(context) {
+	loadColors(context, "global");
+}
+
+function saveGlobalPalette(context) {
+	saveColors(context, "global");
+}
+
+function clearGlobalPalette(context) {	
+	var doc = context.document;
+	doc.inspectorController().globalAssets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
 }
 
