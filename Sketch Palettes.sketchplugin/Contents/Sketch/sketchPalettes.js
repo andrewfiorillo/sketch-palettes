@@ -3,8 +3,10 @@
 
 function loadColors(context, target) {
 	
-	var doc = context.document;
 	var app = NSApplication.sharedApplication();
+	var appController = app.delegate();
+	var doc = context.document;
+	var inspector = doc.inspectorController();
 	var openPanel = NSOpenPanel.openPanel();
 	var version = context.plugin.version().UTF8String();
 	
@@ -43,7 +45,8 @@ function loadColors(context, target) {
 	if (target == "document") {
 		doc.documentData().assets().setPrimitiveColors(colors);	
 	} else if (target == "global" ) {
-		doc.inspectorController().globalAssets().setPrimitiveColors(colors);
+		appController.globalAssets().setPrimitiveColors(colors);
+		appController.globalAssets().objectDidChange();
 	}
 	
 }
@@ -60,13 +63,14 @@ function saveColors(context,target) {
 	
 	var doc = context.document;
 	var app = NSApplication.sharedApplication();
+	var appController = app.delegate();
 	var version = context.plugin.version().UTF8String();
 	
 	// Get colors from target color picker section
 	if (target == "document") {
 		var colors = doc.documentData().assets().primitiveColors();
 	} else if (target == "global"){
-		var colors = doc.inspectorController().globalAssets().colors()	
+		var colors = appController.globalAssets().colors()	
 	}
 	
 	// Only run if there are colors
@@ -151,7 +155,9 @@ function saveGlobalPalette(context) {
 }
 
 function clearGlobalPalette(context) {	
-	var doc = context.document;
-	doc.inspectorController().globalAssets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
+	var app = NSApplication.sharedApplication();
+	var appController = app.delegate();
+	appController.globalAssets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
+	appController.globalAssets().objectDidChange();
 }
 
