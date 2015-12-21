@@ -49,6 +49,8 @@ function loadColors(context, target) {
 		appController.globalAssets().objectDidChange();
 	}
 	
+	appController.refreshCurrentDocument();
+	
 }
 
 
