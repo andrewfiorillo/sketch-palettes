@@ -43,10 +43,9 @@ function loadColors(context, target) {
 	
 	// Load colors in target color picker section
 	if (target == "document") {
-		doc.documentData().assets().setPrimitiveColors(colors);	
+		doc.documentData().assets().setColors(colors);
 	} else if (target == "global" ) {
-		appController.globalAssets().setPrimitiveColors(colors);
-		appController.globalAssets().objectDidChange();
+		appController.globalAssets().setColors(colors);
 	}
 	
 	appController.refreshCurrentDocument();
@@ -61,7 +60,7 @@ function loadColors(context, target) {
 
 function saveColors(context,target) {
 	
-	@import 'sandbox.js'
+	@import 'sandbox.js' // You can probably get rid of this, since versions greater than 3.4.4 are no longer sandboxed
 	
 	var doc = context.document;
 	var app = NSApplication.sharedApplication();
@@ -139,7 +138,7 @@ function saveDocumentPalette(context) {
 
 function clearDocumentPalette(context) {	
 	var doc = context.document;
-	doc.documentData().assets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
+	doc.documentData().assets().setColors(MSArray.dataArrayWithArray([]));
 }
 
 
@@ -159,7 +158,6 @@ function saveGlobalPalette(context) {
 function clearGlobalPalette(context) {	
 	var app = NSApplication.sharedApplication();
 	var appController = app.delegate();
-	appController.globalAssets().setPrimitiveColors(MSArray.dataArrayWithArray([]));
-	appController.globalAssets().objectDidChange();
+	appController.globalAssets().setColors(MSArray.dataArrayWithArray([]));
 }
 
