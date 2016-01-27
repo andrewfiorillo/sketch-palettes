@@ -9,9 +9,11 @@ function loadColors(context, target) {
 	var inspector = doc.inspectorController();
 	var openPanel = NSOpenPanel.openPanel();
 	var version = context.plugin.version().UTF8String();
+	var fileTypes = [NSArray arrayWithObjects:@"sketchpalette",nil]
 	
 	// Open file picker to choose palette file
 	openPanel.setCanChooseDirectories(true);
+	openPanel.setAllowedFileTypes(fileTypes);
 	openPanel.setCanChooseFiles(true);
 	openPanel.setCanCreateDirectories(true);
 	openPanel.setTitle("Choose a file");
