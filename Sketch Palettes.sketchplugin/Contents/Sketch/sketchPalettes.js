@@ -37,7 +37,12 @@ function loadColors(context, target) {
 	// Convert hex strings into MSColors
 	var mspalette = [];
 	for (var i = 0; i < palette.length; i++) {
-		mspalette.push(MSColor.colorWithSVGString(palette[i]));
+		mspalette.push(
+			MSColor.colorWithHue_saturation_brightness_alpha(
+				palette[i].hue,
+				palette[i].saturation,
+				palette[i].brightness,
+				palette[i].alpha));
 	};
 	
 	// Convert array into MSArray
@@ -92,10 +97,15 @@ function saveColors(context,target) {
 			// Convert MSArray into array
 			var mspalette = colors.array();
 			
-			// Convert MSColors into hex strings
+			// Convert MSColors into HSB+alpha JSON
 			var palette = [];
 			for (var i = 0; i < mspalette.count(); i++) {
-				palette.push("#" + mspalette[i].hexValue());
+				palette.push({
+					"hue" : mspalette[i].hue(),
+					"saturation" : mspalette[i].saturation(),
+					"brightness" : mspalette[i].brightness(),
+					"alpha" : mspalette[i].alpha()
+				});
 			};
 			
 			// Palette data
