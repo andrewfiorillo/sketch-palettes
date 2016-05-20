@@ -5,8 +5,8 @@
 	"homepage": "http://github.com/andrewfiorillo/sketch-palettes",
 	"version": "1.1",
 	"identifier": "com.andrewfiorillo.sketch.sketch-palettes",
-	"compatibleVersion": "3.3.3",
-	"bundleVersion": "1.1",
+	"compatibleVersion": "3.7",
+	"bundleVersion": "1.2",
 	"commands": [
 	
 	
