@@ -3,8 +3,7 @@
 
 function loadColors(context, target) {
 	
-	var app = NSApplication.sharedApplication();
-	var appController = app.delegate();
+	var app = NSApp.delegate();
 	var doc = context.document;
 	var inspector = doc.inspectorController();
 	var openPanel = NSOpenPanel.openPanel();
@@ -30,7 +29,7 @@ function loadColors(context, target) {
 	var compatibleVersion = paletteContents.compatibleVersion;
 	
 	if (compatibleVersion && compatibleVersion > version) {
-		app.displayDialog("Your plugin out of date. Please update to the latest version of Sketch Palettes.");
+		NSApp.displayDialog("Your plugin out of date. Please update to the latest version of Sketch Palettes.");
 		return;
 	}
 	
@@ -47,10 +46,10 @@ function loadColors(context, target) {
 	if (target == "document") {
 		doc.documentData().assets().setColors(colors);
 	} else if (target == "global" ) {
-		appController.globalAssets().setColors(colors);
+		app.globalAssets().setColors(colors);
 	}
 	
-	appController.refreshCurrentDocument();
+	app.refreshCurrentDocument();
 	
 }
 
@@ -62,18 +61,15 @@ function loadColors(context, target) {
 
 function saveColors(context,target) {
 	
-	@import 'sandbox.js' // You can probably get rid of this, since versions greater than 3.4.4 are no longer sandboxed
-	
 	var doc = context.document;
-	var app = NSApplication.sharedApplication();
-	var appController = app.delegate();
+	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
 	
 	// Get colors from target color picker section
 	if (target == "document") {
-		var colors = doc.documentData().assets().primitiveColors();
+		var colors = doc.documentData().assets().colors();
 	} else if (target == "global"){
-		var colors = appController.globalAssets().colors()	
+		var colors = app.globalAssets().colors()	
 	}
 	
 	// Only run if there are colors
@@ -112,15 +108,12 @@ function saveColors(context,target) {
 			// Get chosen file path
 			var filePath = savePanel.URL().path();
 			
-			// Request permission to write for App Store version of Sketch
-			new AppSandbox().authorize(@"/Users/" + NSUserName(), function() {
-				// Write file to specified file path
-				[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
-			});	
+			// Write file to specified file path
+			[fileString writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
 
 		}
 		
-	} else { app.displayDialog("No colors in palette!"); }
+	} else { NSApp.displayDialog("No colors in palette!"); }
 
 }
 
@@ -158,8 +151,7 @@ function saveGlobalPalette(context) {
 }
 
 function clearGlobalPalette(context) {	
-	var app = NSApplication.sharedApplication();
-	var appController = app.delegate();
-	appController.globalAssets().setColors(MSArray.dataArrayWithArray([]));
+	var app = NSApp.delegate();
+	app.globalAssets().setColors(MSArray.dataArrayWithArray([]));
 }
 
