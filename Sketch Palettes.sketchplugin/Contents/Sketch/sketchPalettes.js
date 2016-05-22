@@ -102,8 +102,8 @@ function saveColors(context,target) {
 			}
 			
 			// Convert palette data to string
-			fileContents = JSON.stringify(fileJSON);
-			var fileString = NSString.stringWithString(fileContents);
+			var fileContents = JSON.stringify(fileJSON);
+			var fileString = NSString.stringWithString(JSON.stringify(fileJSON));
 			
 			// Get chosen file path
 			var filePath = savePanel.URL().path();
