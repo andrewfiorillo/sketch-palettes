@@ -15,7 +15,6 @@ Move the Sketch Palettes plugin into your Plugins folder. You can get access to 
 
 You can save color palettes from either the Global Colors section of the color picker or from the Document Colors section. Selecting "Save Palette..." in either menu will save those colors as a .sketchpalette file to whatever location you choose.
 
-_Note: If you have the App Store version of Sketch, because of Apple's additional security features, a dialog will pop up asking you to authorize access to the folder you want to save to. You will only ever have to do this once. The version of Sketch downloaded directly from the website does not require this._
 
 #### Loading Palettes
 
