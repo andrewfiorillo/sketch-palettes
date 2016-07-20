@@ -39,15 +39,15 @@ function loadColors(context, target) {
 	// Convert colors to MSColors
 	// Check for older hex code palette version
 	
-	var mspalette = [];
+	var colors = [];
 	
 	if (!compatibleVersion || compatibleVersion < 1.4) {
 		for (var i = 0; i < palette.length; i++) {
-			mspalette.push(MSColor.colorWithSVGString(palette[i]));
+			colors.push(MSColor.colorWithSVGString(palette[i]));
 		};
 	} else {
 		for (var i = 0; i < palette.length; i++) {
-			mspalette.push(MSColor.colorWithRed_green_blue_alpha(
+			colors.push(MSColor.colorWithRed_green_blue_alpha(
 				palette[i].red,
 				palette[i].green,
 				palette[i].blue,
@@ -57,8 +57,6 @@ function loadColors(context, target) {
 	}
 	
 	// Load colors in target color picker section
-	
-	var colors = MSArray.dataArrayWithArray(mspalette);
 	
 	if (target == "global") {
 		app.globalAssets().setColors(colors);
@@ -92,7 +90,7 @@ function saveColors(context,target) {
 	
 	// Only run if there are colors
 	
-	if (colors.count() > 0) {	
+	if (colors.length > 0) {	
 		
 		var save = NSSavePanel.savePanel();
 		save.setNameFieldStringValue("untitled.sketchpalette");
@@ -106,15 +104,14 @@ function saveColors(context,target) {
 			
 			// Convert MSColors to rgba
 			
-			var mspalette = colors.array();
 			var palette = [];
 			
-			for (var i = 0; i < mspalette.count(); i++) {
+			for (var i = 0; i < colors.length; i++) {
 				palette.push({
-					red: mspalette[i].red(),
-					green: mspalette[i].green(),
-					blue: mspalette[i].blue(),
-					alpha: mspalette[i].alpha()	
+					red: colors[i].red(),
+					green: colors[i].green(),
+					blue: colors[i].blue(),
+					alpha: colors[i].alpha()	
 				});
 			};
 			
@@ -160,7 +157,7 @@ function saveGlobalPalette(context) {
 
 function clearGlobalPalette(context) {	
 	var app = NSApp.delegate();
-	app.globalAssets().setColors(MSArray.dataArrayWithArray([]));
+	app.globalAssets().setColors([]);
 }
 
 
@@ -176,6 +173,6 @@ function saveDocumentPalette(context) {
 
 function clearDocumentPalette(context) {	
 	var doc = context.document;
-	doc.documentData().assets().setColors(MSArray.dataArrayWithArray([]));
+	doc.documentData().assets().setColors([]);
 }
 
