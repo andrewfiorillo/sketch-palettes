@@ -1,3 +1,7 @@
+```
+Known issue: If you are having trouble loading your palettes, sketch updated it's color format. As a result, you may need to manually update your palettes or create new sketch-palettes files so that they will be compatible.
+```
+
 # Sketch Palettes
 
 A Sketch plugin that lets you save and load colors into the color picker.
