@@ -1,7 +1,3 @@
-```
-Known issue: If you are having trouble loading your palettes, sketch updated it's color format. As a result, you may need to manually update your palettes or create new sketch-palettes files so that they will be compatible.
-```
-
 # Sketch Palettes
 
 A Sketch plugin that lets you save and load colors into the color picker.
@@ -23,6 +19,8 @@ You can save color palettes from either the Global Colors section of the color p
 #### Loading Palettes
 
 You can load colors into either the Global Colors section of the color picker or into the Document Colors section. Selecting "Load Palette..." from either menu will prompt you to open a .sketchpalette file containing the colors you want to load. This will replace whatever colors are currently in the selected section.
+
+*Known issue: if you are having trouble loading palettes, it might be because you are using an older palette file. The file format was changed to support transparent colors. Because of a change introduced in Sketch v39, backwards compatibilty was dropped. You may need to manually recreate the palette to be compatible with the latest versions of Sketch and this plugin.*
 
 #### Removing Palettes
 
