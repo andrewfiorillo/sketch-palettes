@@ -43,7 +43,7 @@ function loadColors(context, target) {
 	
 	if (!compatibleVersion || compatibleVersion < 1.4) {
 		for (var i = 0; i < palette.length; i++) {
-			colors.push(MSColor.colorWithSVGString(palette[i]));
+			colors.push(MSImmutableColor.colorWithSVGString(palette[i]).newMutableCounterpart());
 		};
 	} else {
 		for (var i = 0; i < palette.length; i++) {
