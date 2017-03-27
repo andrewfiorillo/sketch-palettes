@@ -17,7 +17,7 @@ You can save color palettes from either the Global Colors section of the color p
 
 #### Loading Palettes
 
-You can load colors into either the Global Colors section of the color picker or into the Document Colors section. Selecting "Load Palette..." from either menu will prompt you to open a .sketchpalette file containing the colors you want to load. This will replace whatever colors are currently in the selected section.
+You can load colors into either the Global Colors section of the color picker or into the Document Colors section. Selecting "Load Palette..." from either menu will prompt you to open a .sketchpalette file containing the colors you want to load. Colors will then be appended to the corresponding color picker section.
 
 #### Removing Palettes
 
