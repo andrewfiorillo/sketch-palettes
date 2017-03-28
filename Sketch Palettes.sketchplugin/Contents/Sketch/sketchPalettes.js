@@ -35,19 +35,11 @@ function loadColors(context, target) {
 		NSApp.displayDialog("Your plugin out of date. Please update to the latest version of Sketch Palettes.");
 		return;
 	}
-
-	// Save current colors from target color picker section
-	
-	if (target == "global") {
-		var currentPalette = app.globalAssets().colors();
-	} else if (target == "document") {
-		var currentPalette = doc.documentData().assets().colors();
-	}
-
-	var colors = currentPalette.slice();
 	
 	// Convert colors to MSColors
 	// Check for older hex code palette version
+	
+	var colors = [];
 		
 	if (!compatibleVersion || compatibleVersion < 1.4) {
 		for (var i = 0; i < palette.length; i++) {
@@ -67,9 +59,9 @@ function loadColors(context, target) {
 	// Load colors in target color picker section
 	
 	if (target == "global") {
-		app.globalAssets().setColors(colors);
+		app.globalAssets().addColors(colors);
 	} else if (target == "document" ) {
-		doc.documentData().assets().setColors(colors);
+		doc.documentData().assets().addColors(colors);
 	}
 	
 	app.refreshCurrentDocument();
