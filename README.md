@@ -1,6 +1,6 @@
 # Sketch Palettes
 
-A Sketch plugin that lets you save and load colors into the color picker.
+Sketch Palettes is a plugin for Sketch that lets you save and load colors into the color picker.
 
 <img src="palettes.png" style="width: 100%; max-width:800px;" />
 
