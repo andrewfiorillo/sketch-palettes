@@ -4,15 +4,15 @@
 //-------------------------------------------------------------------------------------------------------------
 
 function loadColors(context, target) {
-	
+
 	var app = NSApp.delegate();
 	var doc = context.document;
 	var open = NSOpenPanel.openPanel();
 	var version = context.plugin.version().UTF8String();
 	var fileTypes = [NSArray arrayWithObjects:@"sketchpalette",nil];
-	
+
 	// Open file picker to choose palette file
-	
+
 	open.setAllowedFileTypes(fileTypes);
 	open.setCanChooseDirectories(true);
 	open.setCanChooseFiles(true);
@@ -20,27 +20,27 @@ function loadColors(context, target) {
 	open.setTitle("Choose a file");
 	open.setPrompt("Choose");
 	open.runModal();
-	
+
 	// Read contents of file into NSString, then to JSON
-	
+
 	var filePath = open.URLs().firstObject().path();
 	var fileContents = NSString.stringWithContentsOfFile(filePath);
 	var paletteContents = JSON.parse(fileContents.toString());
 	var palette = paletteContents.colors;
 	var compatibleVersion = paletteContents.compatibleVersion;
-	
+
 	// Check if plugin is out of date anf incompatible with a newer palette version
-	
+
 	if (compatibleVersion && compatibleVersion > version) {
 		NSApp.displayDialog("Your plugin out of date. Please update to the latest version of Sketch Palettes.");
 		return;
 	}
-	
+
 	// Convert colors to MSColors
 	// Check for older hex code palette version
-	
+
 	var colors = [];
-		
+
 	if (!compatibleVersion || compatibleVersion < 1.4) {
 		for (var i = 0; i < palette.length; i++) {
 			colors.push(MSImmutableColor.colorWithSVGString(palette[i]).newMutableCounterpart());
@@ -52,20 +52,20 @@ function loadColors(context, target) {
 				palette[i].green,
 				palette[i].blue,
 				palette[i].alpha
-			));	
+			));
 		};
 	}
-	
+
 	// Load colors in target color picker section
-	
+
 	if (target == "global") {
 		app.globalAssets().addColors(colors);
 	} else if (target == "document" ) {
 		doc.documentData().assets().addColors(colors);
 	}
-	
+
 	app.refreshCurrentDocument();
-	
+
 }
 
 
@@ -75,46 +75,46 @@ function loadColors(context, target) {
 
 
 function saveColors(context,target) {
-	
+
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
-	
+
 	// Get colors from target color picker section
-	
+
 	if (target == "global") {
-		var colors = app.globalAssets().colors()	
+		var colors = app.globalAssets().colors()
 	} else if (target == "document") {
 		var colors = doc.documentData().assets().colors();
 	}
-	
+
 	// Only run if there are colors
-	
-	if (colors.length > 0) {	
-		
+
+	if (colors.length > 0) {
+
 		var save = NSSavePanel.savePanel();
 		save.setNameFieldStringValue("untitled.sketchpalette");
 		save.setAllowedFileTypes([@"sketchpalette"]);
 		save.setAllowsOtherFileTypes(false);
 		save.setExtensionHidden(false);
-		
+
 		// Open save dialog and run if Save was clicked
-		
+
 		if (save.runModal()) {
-			
+
 			// Convert MSColors to rgba
-			
+
 			var palette = [];
-			
+
 			for (var i = 0; i < colors.length; i++) {
 				palette.push({
 					red: colors[i].red(),
 					green: colors[i].green(),
 					blue: colors[i].blue(),
-					alpha: colors[i].alpha()	
+					alpha: colors[i].alpha()
 				});
 			};
-			
+
 			// Palette data
 
 			var fileData = {
@@ -122,20 +122,121 @@ function saveColors(context,target) {
 				"pluginVersion": version, //  plugin version used to save palette
 				"colors": palette
 			}
-			
+
 			// Get chosen file path
-			
+
 			var filePath = save.URL().path();
-			
+
 			// Write file to specified file path
-			
+
 			var file = NSString.stringWithString(JSON.stringify(fileData));
-			
+
 			[file writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
 
 		}
-		
+
 	} else { NSApp.displayDialog("No colors in palette!"); }
+
+}
+
+
+//-------------------------------------------------------------------------------------------------------------
+// Load gradients
+//-------------------------------------------------------------------------------------------------------------
+
+
+function loadGradients(context, target) {
+
+	var app = NSApp.delegate();
+	var doc = context.document;
+	var open = NSOpenPanel.openPanel();
+	var version = context.plugin.version().UTF8String();
+	var fileTypes = [NSArray arrayWithObjects:@"sketchpalette",nil];
+
+	// Open file picker to choose palette file
+
+	open.setAllowedFileTypes(fileTypes);
+	open.setCanChooseDirectories(true);
+	open.setCanChooseFiles(true);
+	open.setCanCreateDirectories(true);
+	open.setTitle("Choose a file");
+	open.setPrompt("Choose");
+	open.runModal();
+
+	// Read contents of file into NSString, then to JSON
+
+	var filePath = open.URLs().firstObject().path();
+	var fileContents = NSString.stringWithContentsOfFile(filePath);
+	var paletteContents = JSON.parse(fileContents.toString());
+	var palette = paletteContents.gradients;
+	var compatibleVersion = paletteContents.compatibleVersion;
+
+
+	// Check if plugin is out of date anf incompatible with a newer palette version
+
+	if (compatibleVersion && compatibleVersion > version) {
+		NSApp.displayDialog("Your plugin is out of date. Please update to the latest version.");
+		return;
+	}
+
+	var gradients = [];
+
+	for (var i = 0; i < palette.length; i++) {
+
+		// Create gradient stops
+		var stops = []
+		for (var j = 0; j < palette[i].stops.length; j++) {
+			var color = MSColor.colorWithRed_green_blue_alpha(
+										palette[i].stops[j].color.red,
+										palette[i].stops[j].color.green,
+										palette[i].stops[j].color.blue,
+										palette[i].stops[j].color.alpha
+									);
+			var stop = MSGradientStop.stopWithPosition_color_(palette[i].stops[j].position, color);
+			stops.push(stop);
+		}
+
+		// Create gradient object
+		var gradient = MSGradient.new();
+
+		// Set basic properties
+		gradient.setGradientType(palette[i].gradientType);
+		gradient.shouldSmoothenOpacity = palette[i].shouldSmoothenOpacity;
+		gradient.elipseLength = palette[i].elipseLength;
+		gradient.setStops(stops);
+
+		// Parse From and To values into arrays e.g.: from: "{0.1,-0.43}" => fromValue = [0.1, -0.43]
+		fromValue = palette[i].from.slice(1,-1).split(",");
+		toValue = palette[i].to.slice(1,-1).split(",");
+
+		// Create CGPoint objects
+		cgPointFrom = {
+			x: fromValue[0],
+			y: fromValue[1]
+		}
+		cgPointTo = {
+			x: toValue[0],
+			y: toValue[1]
+		}
+
+		// Set From and To values
+		gradient.setFrom(cgPointFrom);
+		gradient.setTo(cgPointTo);
+
+		gradients.push(gradient);
+
+	}
+
+	// Load colors in target color picker section
+
+	if (target == "document") {
+		doc.documentData().assets().addGradients(gradients);
+	}
+	else if (target == "global") {
+		app.globalAssets().addGradients(gradients);
+	}
+
+	app.refreshCurrentDocument();
 
 }
 
@@ -155,13 +256,13 @@ function saveGlobalPalette(context) {
 	saveColors(context, "global");
 }
 
-function clearGlobalPalette(context) {	
+function clearGlobalPalette(context) {
 	var app = NSApp.delegate();
 	app.globalAssets().setColors([]);
 }
 
 
-// Document Colors 
+// Document Colors
 
 function loadDocumentPalette(context) {
 	loadColors(context, "document");
@@ -171,8 +272,7 @@ function saveDocumentPalette(context) {
 	saveColors(context, "document");
 }
 
-function clearDocumentPalette(context) {	
+function clearDocumentPalette(context) {
 	var doc = context.document;
 	doc.documentData().assets().setColors([]);
 }
-
