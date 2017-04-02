@@ -1,18 +1,20 @@
 
+@import "util.js";
+
 //-------------------------------------------------------------------------------------------------------------
 // Load color palette
 //-------------------------------------------------------------------------------------------------------------
 
-function loadColors(context, target) {
+function loadColors(context) {
 	
 	var app = NSApp.delegate();
 	var doc = context.document;
-	var open = NSOpenPanel.openPanel();
 	var version = context.plugin.version().UTF8String();
 	var fileTypes = [NSArray arrayWithObjects:@"sketchpalette",nil];
-	
+		
 	// Open file picker to choose palette file
 	
+	var open = NSOpenPanel.openPanel();
 	open.setAllowedFileTypes(fileTypes);
 	open.setCanChooseDirectories(true);
 	open.setCanChooseFiles(true);
@@ -56,11 +58,38 @@ function loadColors(context, target) {
 		};
 	}
 	
+	// Create dialog
+	
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Load Palette");
+	dialog.addButtonWithTitle("Load");
+	dialog.addButtonWithTitle("Cancel");
+	
+	// Create view to hold custom fields
+	
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
+	
+	// Create select box and label, and add it to custom view
+	
+	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Load palette into:');
+	customView.addSubview(sourceLabel);
+
+	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(source);
+	
+	// Add custom view to dialog
+	
+	dialog.setAccessoryView(customView);
+	
+	// Open dialog
+	
+	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
+	
 	// Load colors in target color picker section
 	
-	if (target == "global") {
+	if (source.indexOfSelectedItem() == 0) {
 		app.globalAssets().addColors(colors);
-	} else if (target == "document" ) {
+	} else if (source.indexOfSelectedItem() == 1) {
 		doc.documentData().assets().addColors(colors);
 	}
 	
@@ -74,17 +103,44 @@ function loadColors(context, target) {
 //-------------------------------------------------------------------------------------------------------------
 
 
-function saveColors(context,target) {
+function saveColors(context) {
 	
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
+	var target = "global";
 	
-	// Get colors from target color picker section
 	
-	if (target == "global") {
-		var colors = app.globalAssets().colors()	
-	} else if (target == "document") {
+	// Create dialog
+	
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Save Palette");
+	dialog.addButtonWithTitle("Save");
+	dialog.addButtonWithTitle("Cancel");
+	
+	// Create view to hold custom fields
+	
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
+	
+	// Create select box and label, and add it to custom view
+	
+	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Source:');
+	customView.addSubview(sourceLabel);
+
+	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(source);
+	
+	// Add custom view to dialog
+	
+	dialog.setAccessoryView(customView);
+	
+	// Open dialog
+	
+	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
+
+	if (source.indexOfSelectedItem() == 0) {
+		var colors = app.globalAssets().colors();
+	} else if (source.indexOfSelectedItem() == 1) {
 		var colors = doc.documentData().assets().colors();
 	}
 	
@@ -147,14 +203,6 @@ function saveColors(context,target) {
 
 // Global Colors
 
-function loadGlobalPalette(context) {
-	loadColors(context, "global");
-}
-
-function saveGlobalPalette(context) {
-	saveColors(context, "global");
-}
-
 function clearGlobalPalette(context) {	
 	var app = NSApp.delegate();
 	app.globalAssets().setColors([]);
@@ -163,16 +211,19 @@ function clearGlobalPalette(context) {
 
 // Document Colors 
 
-function loadDocumentPalette(context) {
-	loadColors(context, "document");
-}
-
-function saveDocumentPalette(context) {
-	saveColors(context, "document");
-}
-
 function clearDocumentPalette(context) {	
 	var doc = context.document;
 	doc.documentData().assets().setColors([]);
+}
+
+
+// Dialogs
+
+function loadPalette(context) {
+	loadColors(context);
+}
+
+function savePalette(context) {
+	saveColors(context);
 }
 

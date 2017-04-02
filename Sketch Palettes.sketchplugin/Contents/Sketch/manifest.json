@@ -12,6 +12,22 @@
 	
 		{
 			"name": "Load Palette...",
+			"identifier": "loadPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "loadPalette"
+		},
+		{
+			"name": "Save Palette...",
+			"identifier": "savePalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "savePalette"
+		},
+		
+		
+		{
+			"name": "Load Palette...",
 			"identifier": "loadDocumentPalette",
 			"shortcut": "",
 			"script": "sketchPalettes.js",
@@ -60,6 +76,8 @@
 	],
 	"menu": {
 		"items": [
+			"loadPalette",
+			"savePalette",
 			{
 				"title": "Document Colors",
 				"items": [
