@@ -11,6 +11,8 @@ Move the Sketch Palettes plugin into your Plugins folder. You can get access to 
 ## Install with Sketch Runner
 With Sketch Runner, just go to the `install` command and search for `Sketch Palettes`. Runner allows you to manage plugins and do much more to speed up your workflow in Sketch. [Download Runner here](http://www.sketchrunner.com).
 
+<img src="sketch-palettes-runner.png" style="width: 100%; max-width:800px;" />
+
 # Usage
 
 #### Saving Palettes
