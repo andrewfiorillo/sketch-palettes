@@ -8,8 +8,6 @@
 	"compatibleVersion": "39",
 	"bundleVersion": "1.5",
 	"commands": [
-	
-	
 		{
 			"name": "Load Palette...",
 			"identifier": "loadPalette",
@@ -24,76 +22,19 @@
 			"script": "sketchPalettes.js",
 			"handler": "savePalette"
 		},
-		
-		
 		{
-			"name": "Load Palette...",
-			"identifier": "loadDocumentPalette",
+			"name": "Clear Palette...",
+			"identifier": "clearPalette",
 			"shortcut": "",
 			"script": "sketchPalettes.js",
-			"handler": "loadDocumentPalette"
-		},
-		{
-			"name": "Save Palette...",
-			"identifier": "saveDocumentPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "saveDocumentPalette"
-		},
-		{
-			"name": "Clear Palette",
-			"identifier": "clearDocumentPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "clearDocumentPalette"
-		},
-		
-		
-		
-		{
-			"name": "Load Palette...",
-			"identifier": "loadGlobalPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "loadGlobalPalette"
-		},
-		{
-			"name": "Save Palette...",
-			"identifier": "saveGlobalPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "saveGlobalPalette"
-		},
-		{
-			"name": "Clear Palette",
-			"identifier": "clearGlobalPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "clearGlobalPalette"
+			"handler": "clearPalette"
 		}
-		
-		
 	],
 	"menu": {
 		"items": [
 			"loadPalette",
 			"savePalette",
-			{
-				"title": "Document Colors",
-				"items": [
-					"loadDocumentPalette",
-					"saveDocumentPalette",
-					"clearDocumentPalette"
-				],
-			},
-			{
-				"title": "Global Colors",
-				"items": [
-					"loadGlobalPalette",
-					"saveGlobalPalette",
-					"clearGlobalPalette"
-				],
-			}
+			"clearPalette"
 		]
 	}
 }

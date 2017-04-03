@@ -2,10 +2,10 @@
 @import "util.js";
 
 //-------------------------------------------------------------------------------------------------------------
-// Load color palette
+// Load palette
 //-------------------------------------------------------------------------------------------------------------
 
-function loadColors(context) {
+function loadPalette(context) {
 	
 	var app = NSApp.delegate();
 	var doc = context.document;
@@ -69,8 +69,6 @@ function loadColors(context) {
 	
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
 	
-	// Create select box and label, and add it to custom view
-	
 	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Load palette into:');
 	customView.addSubview(sourceLabel);
 
@@ -99,17 +97,16 @@ function loadColors(context) {
 
 
 //-------------------------------------------------------------------------------------------------------------
-// Save color palette
+// Save  palette
 //-------------------------------------------------------------------------------------------------------------
 
 
-function saveColors(context) {
+function savePalette(context) {
 	
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
 	var target = "global";
-	
 	
 	// Create dialog
 	
@@ -121,8 +118,6 @@ function saveColors(context) {
 	// Create view to hold custom fields
 	
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
-	
-	// Create select box and label, and add it to custom view
 	
 	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Source:');
 	customView.addSubview(sourceLabel);
@@ -197,33 +192,47 @@ function saveColors(context) {
 
 
 //-------------------------------------------------------------------------------------------------------------
-// Menu Items
+// Clear palette
 //-------------------------------------------------------------------------------------------------------------
 
-
-// Global Colors
-
-function clearGlobalPalette(context) {	
-	var app = NSApp.delegate();
-	app.globalAssets().setColors([]);
-}
-
-
-// Document Colors 
-
-function clearDocumentPalette(context) {	
+function clearPalette(context) {
+	
 	var doc = context.document;
-	doc.documentData().assets().setColors([]);
-}
+	var app = NSApp.delegate();
+	var version = context.plugin.version().UTF8String();
+	
+	// Create dialog
+	
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Clear Palette");
+	dialog.addButtonWithTitle("Clear");
+	dialog.addButtonWithTitle("Cancel");
+	
+	// Create view to hold custom fields
+	
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
+	
+	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
+	customView.addSubview(sourceLabel);
 
+	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(source);
+	
+	// Add custom view to dialog
+	
+	dialog.setAccessoryView(customView);
+	
+	// Open dialog and clear chosen palette
+	
+	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
+	
+	if (source.indexOfSelectedItem() == 0) {
+		app.globalAssets().setColors([]);
+	} else if (source.indexOfSelectedItem() == 1) {
+		doc.documentData().assets().setColors([]);
+	}
+	
+	app.refreshCurrentDocument();
 
-// Dialogs
-
-function loadPalette(context) {
-	loadColors(context);
-}
-
-function savePalette(context) {
-	saveColors(context);
 }
 
