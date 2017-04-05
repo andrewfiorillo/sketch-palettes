@@ -23,6 +23,11 @@ You can load colors into either the Global Colors section of the color picker or
 
 Select "Clear Palette" to remove all colors from either the Global Colors section of the color picker or from the Document Colors section.
 
+#### Resources
+
+Color palettes, extensions, and other resources related to Sketch Palettes.
+* [Sketch Color Palettes](https://github.com/WhatsNewSaes/Sketch-Color-Palettes) Popular color palettes: IOS 7, Material Design, Flat UI
+
 # Info & Feedback
 
 If you have any questions, find a bug, or have ideas for ways to improve the plugin, ping me on twitter: <a href="https://twitter.com/AndrewFiorillo" target="_blank">@andrewfiorillo</a>
