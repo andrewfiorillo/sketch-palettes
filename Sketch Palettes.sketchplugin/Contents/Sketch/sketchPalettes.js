@@ -239,31 +239,42 @@ function clearPalette(context) {
 
 
 function saveImages(context) {
+	
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
-	
-	// log(app.globalAssets().images()[0].NSImage());
-	// log(doc.documentData().assets().images()[0].image().class());
-	// log(doc.documentData().assets().images()[0].data().class());
-	// log(doc.documentData().assets().images()[0].sha1().class());
-	// doc.documentData().assets().setImages([]);
 			
 	var save = NSSavePanel.savePanel();
-		save.setNameFieldStringValue("untitled.sketchpalette");
-		save.setAllowedFileTypes([@"sketchpalette"]);
-		save.setAllowsOtherFileTypes(false);
-		save.setExtensionHidden(false);
+	save.setNameFieldStringValue("untitled.sketchpalette");
+	save.setAllowedFileTypes([@"sketchpalette"]);
+	save.setAllowsOtherFileTypes(false);
+	save.setExtensionHidden(false);
 		
 		// Open save dialog and run if Save was clicked
 		
 		if (save.runModal()) {
 			
-			var data = doc.documentData().assets().images()[0].data()
-			var nsdata = NSData.dataWithData(data);
-			var basedata = [nsdata base64EncodedStringWithOptions:0]
+			var images = doc.documentData().assets().images()
+			var imagePalette = []
 			
-			log(basedata.class())
+			for (var i = 0; i < images.length; i++) {	
+				var data = images[i].data()
+				var nsdata = NSData.dataWithData(data);
+				var base64Color = [nsdata base64EncodedStringWithOptions:0];
+				imagePalette.push(base64Color);
+			};
+			
+			log(imagePalette);
+			
+			var fileData = {
+				"compatibleVersion": "1.4", // min plugin version to load palette
+				"pluginVersion": version, //  plugin version used to save palette
+				"images":  imagePalette
+			}
+			
+			// log(fileData);
+			
+			// return;
 			
 			// Get chosen file path
 			
@@ -271,9 +282,17 @@ function saveImages(context) {
 			
 			// Write file to specified file path
 			
-			var file = basedata;
+			var fileJSON = JSON.stringify(fileData);
 			
-			// var file = NSString.stringWithString(JSON.stringify(basedata));
+			log(fileJSON);
+			
+			return;
+			
+			var file = NSString.stringWithString(JSON.stringify(fileData));
+			
+			// log(file);
+			
+			// return;
 			
 			[file writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
 
@@ -310,10 +329,14 @@ function loadImages(context) {
 	var msimage = MSImageData.alloc().initWithImage_convertColorSpace(nsimage, false);
 	
 	// Keept current images
-	var currentImages = doc.documentData().assets().images().slice();
-	var newImages = currentImages.concat([msimage]);
+	// var currentImages = doc.documentData().assets().images().slice();
+	// var newImages = currentImages.concat([msimage]);
 	
-	doc.documentData().assets().setImages(newImages);
+	// doc.documentData().assets().setImages(newImages);
+	
+	var currentImages = app.globalAssets().images().slice();
+	var newImages = currentImages.concat([msimage]);
+	app.globalAssets().setImages(newImages);
 
 }
 
