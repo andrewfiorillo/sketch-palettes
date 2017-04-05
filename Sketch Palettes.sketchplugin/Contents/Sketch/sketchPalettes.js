@@ -236,3 +236,84 @@ function clearPalette(context) {
 
 }
 
+
+
+function saveImages(context) {
+	var doc = context.document;
+	var app = NSApp.delegate();
+	var version = context.plugin.version().UTF8String();
+	
+	// log(app.globalAssets().images()[0].NSImage());
+	// log(doc.documentData().assets().images()[0].image().class());
+	// log(doc.documentData().assets().images()[0].data().class());
+	// log(doc.documentData().assets().images()[0].sha1().class());
+	// doc.documentData().assets().setImages([]);
+			
+	var save = NSSavePanel.savePanel();
+		save.setNameFieldStringValue("untitled.sketchpalette");
+		save.setAllowedFileTypes([@"sketchpalette"]);
+		save.setAllowsOtherFileTypes(false);
+		save.setExtensionHidden(false);
+		
+		// Open save dialog and run if Save was clicked
+		
+		if (save.runModal()) {
+			
+			var data = doc.documentData().assets().images()[0].data()
+			var nsdata = NSData.dataWithData(data);
+			var basedata = [nsdata base64EncodedStringWithOptions:0]
+			
+			log(basedata.class())
+			
+			// Get chosen file path
+			
+			var filePath = save.URL().path();
+			
+			// Write file to specified file path
+			
+			var file = basedata;
+			
+			// var file = NSString.stringWithString(JSON.stringify(basedata));
+			
+			[file writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
+
+		}
+}
+
+
+function loadImages(context) {
+	
+	var doc = context.document;
+	var app = NSApp.delegate();
+	var version = context.plugin.version().UTF8String();
+	var fileTypes = [NSArray arrayWithObjects:@"sketchpalette",nil];
+	
+	var open = NSOpenPanel.openPanel();
+	open.setAllowedFileTypes(fileTypes);
+	open.setCanChooseDirectories(true);
+	open.setCanChooseFiles(true);
+	open.setCanCreateDirectories(true);
+	open.setTitle("Choose a file");
+	open.setPrompt("Choose");
+	open.runModal();
+	
+	// Read contents of file into NSString
+	
+	var filePath = open.URLs().firstObject().path();
+	var fileContents = NSString.stringWithContentsOfFile(filePath);
+	var filestring = fileContents.toString();
+	
+	// Convert base64 encoded string to NSImage, then to MSImageData
+	
+	var nsdata = NSData.alloc().initWithBase64EncodedString_options(filestring, 0);
+	var nsimage = NSImage.alloc().initWithData(nsdata);
+	var msimage = MSImageData.alloc().initWithImage_convertColorSpace(nsimage, false);
+	
+	// Keept current images
+	var currentImages = doc.documentData().assets().images().slice();
+	var newImages = currentImages.concat([msimage]);
+	
+	doc.documentData().assets().setImages(newImages);
+
+}
+
