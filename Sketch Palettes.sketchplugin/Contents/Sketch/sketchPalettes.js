@@ -243,42 +243,110 @@ function saveImages(context) {
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
-			
+	var images = [], gradients = [], colors = [];
+	
+	// Create dialog
+	
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Save Palette");
+	dialog.addButtonWithTitle("Save");
+	dialog.addButtonWithTitle("Cancel");
+	
+	// Create custom view and fields
+	
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
+	
+	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Source:');
+	customView.addSubview(sourceLabel);
+
+	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(source);
+	
+	// Add custom view to dialog
+	
+	dialog.setAccessoryView(customView);
+	
+	// Open dialog and exit if user selects Cancel
+	
+	if (dialog.runModal() != NSAlertFirstButtonReturn) {
+		return;
+	}
+	
+	// Get Presets from selected section
+	
+	if (source.indexOfSelectedItem() == 0) {
+		colors = app.globalAssets().colors();
+		images = app.globalAssets().images();
+	} else if (source.indexOfSelectedItem() == 1) {
+		colors = doc.documentData().assets().colors();
+		images = doc.documentData().assets().images();
+	}
+	
+	// Check to make sure there are presets available
+	
+	if (colors.length < 0 && images.length < 0) {
+		NSApp.displayDialog("No presets available!");
+		return;
+	}
+	
+	// Create save dialog
+	
 	var save = NSSavePanel.savePanel();
 	save.setNameFieldStringValue("untitled.sketchpalette");
 	save.setAllowedFileTypes(["sketchpalette"]);
 	save.setAllowsOtherFileTypes(false);
 	save.setExtensionHidden(false);
 		
-		// Open save dialog and run if Save was clicked
+	// Open save dialog and run if Save was clicked
+	
+	if (save.runModal()) {
 		
-		if (save.runModal()) {
+		// Build color palette
+		
+		var colorPalette = [];
 			
-			var images = doc.documentData().assets().images();
-			var imagePalette = []
-			
-			for (var i = 0; i < images.length; i++) {	
-				var data = images[i].data()
-				var nsdata = NSData.dataWithData(data);
-				var base64Color = nsdata.base64EncodedStringWithOptions(0).UTF8String();
-				imagePalette.push(base64Color);
-			};
-			
-			var fileData = {
-				"compatibleVersion": "1.4", // min plugin version to load palette
-				"pluginVersion": version, //  plugin version used to save palette
-				"images":  imagePalette
-			}
-			
-			// Write file to chosen file path
-			
-			var filePath = save.URL().path();
-			var file = NSString.stringWithString(JSON.stringify(fileData));
-			
-			file.writeToFile_atomically_encoding_error(filePath, true, NSUTF8StringEncoding, null);
-
+		for (var i = 0; i < colors.length; i++) {
+			colorPalette.push({
+				red: colors[i].red(),
+				green: colors[i].green(),
+				blue: colors[i].blue(),
+				alpha: colors[i].alpha()	
+			});
+		};
+		
+		// Build image palette
+		
+		var imagePalette = []
+		
+		for (var i = 0; i < images.length; i++) {	
+			var data = images[i].data()
+			var nsdata = NSData.dataWithData(data);
+			var base64Color = nsdata.base64EncodedStringWithOptions(0).UTF8String();
+			imagePalette.push(base64Color);
+		};
+		
+		// Assemble file contents
+		
+		var fileData = {
+			"compatibleVersion": "1.4", // min plugin version to load palette
+			"pluginVersion": version, //  plugin version used to save palette
+			"colors": colorPalette,
+			"images":  imagePalette
 		}
+		
+		// Write file to chosen file path
+		
+		var filePath = save.URL().path();
+		var file = NSString.stringWithString(JSON.stringify(fileData));
+		
+		file.writeToFile_atomically_encoding_error(filePath, true, NSUTF8StringEncoding, null);
+
+	}
 }
+
+
+
+
 
 
 function loadImages(context) {
