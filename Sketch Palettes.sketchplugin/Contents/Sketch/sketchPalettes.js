@@ -246,7 +246,7 @@ function saveImages(context) {
 			
 	var save = NSSavePanel.savePanel();
 	save.setNameFieldStringValue("untitled.sketchpalette");
-	save.setAllowedFileTypes([@"sketchpalette"]);
+	save.setAllowedFileTypes(["sketchpalette"]);
 	save.setAllowsOtherFileTypes(false);
 	save.setExtensionHidden(false);
 		
@@ -254,17 +254,15 @@ function saveImages(context) {
 		
 		if (save.runModal()) {
 			
-			var images = doc.documentData().assets().images()
+			var images = doc.documentData().assets().images();
 			var imagePalette = []
 			
 			for (var i = 0; i < images.length; i++) {	
 				var data = images[i].data()
 				var nsdata = NSData.dataWithData(data);
-				var base64Color = [nsdata base64EncodedStringWithOptions:0];
+				var base64Color = nsdata.base64EncodedStringWithOptions(0).UTF8String();
 				imagePalette.push(base64Color);
 			};
-			
-			log(imagePalette);
 			
 			var fileData = {
 				"compatibleVersion": "1.4", // min plugin version to load palette
@@ -272,29 +270,12 @@ function saveImages(context) {
 				"images":  imagePalette
 			}
 			
-			// log(fileData);
-			
-			// return;
-			
-			// Get chosen file path
+			// Write file to chosen file path
 			
 			var filePath = save.URL().path();
-			
-			// Write file to specified file path
-			
-			var fileJSON = JSON.stringify(fileData);
-			
-			log(fileJSON);
-			
-			return;
-			
 			var file = NSString.stringWithString(JSON.stringify(fileData));
 			
-			// log(file);
-			
-			// return;
-			
-			[file writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
+			file.writeToFile_atomically_encoding_error(filePath, true, NSUTF8StringEncoding, null);
 
 		}
 }
