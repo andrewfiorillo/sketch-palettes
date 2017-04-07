@@ -1,9 +1,11 @@
 
 @import "util.js";
 
+
 //-------------------------------------------------------------------------------------------------------------
 // Load palette
 //-------------------------------------------------------------------------------------------------------------
+
 
 function loadPalette(context) {
 	
@@ -28,8 +30,10 @@ function loadPalette(context) {
 	var filePath = open.URLs().firstObject().path();
 	var fileContents = NSString.stringWithContentsOfFile(filePath);
 	var paletteContents = JSON.parse(fileContents.toString());
-	var palette = paletteContents.colors;
 	var compatibleVersion = paletteContents.compatibleVersion;
+	var colorPalette = paletteContents.colors ? paletteContents.colors : [];
+	var gradientPalette = paletteContents.gradients ? paletteContents.gradients : [];
+	var imagePalette = paletteContents.images ? paletteContents.images : [];
 	
 	// Check if plugin is out of date anf incompatible with a newer palette version
 	
@@ -38,24 +42,43 @@ function loadPalette(context) {
 		return;
 	}
 	
-	// Convert colors to MSColors
-	// Check for older hex code palette version
+	var colors = [], gradients = [], images = [];
 	
-	var colors = [];
+	// Check for older hex code palette version
 		
 	if (!compatibleVersion || compatibleVersion < 1.4) {
+		
+		// Convert hex colors to MSColors
+		
 		for (var i = 0; i < palette.length; i++) {
 			colors.push(MSImmutableColor.colorWithSVGString(palette[i]).newMutableCounterpart());
 		};
+		
 	} else {
-		for (var i = 0; i < palette.length; i++) {
-			colors.push(MSColor.colorWithRed_green_blue_alpha(
-				palette[i].red,
-				palette[i].green,
-				palette[i].blue,
-				palette[i].alpha
-			));	
-		};
+		
+		// Convert rgba colors to MSColors
+		
+		if (colorPalette.length > 0) {
+			for (var i = 0; i < colorPalette.length; i++) {
+				colors.push(MSColor.colorWithRed_green_blue_alpha(
+					colorPalette[i].red,
+					colorPalette[i].green,
+					colorPalette[i].blue,
+					colorPalette[i].alpha
+				));	
+			};	
+		}
+		
+		// convert base64 strings to MSImageData objects
+		
+		if (imagePalette.length > 0) {
+			for (var i = 0; i < imagePalette.length; i++) {
+				var nsdata = NSData.alloc().initWithBase64EncodedString_options(imagePalette[i], 0);
+				var nsimage = NSImage.alloc().initWithData(nsdata);
+				var msimage = MSImageData.alloc().initWithImage_convertColorSpace(nsimage, false);
+				images.push(msimage);	
+			};
+		}
 	}
 	
 	// Create dialog
@@ -79,16 +102,26 @@ function loadPalette(context) {
 	
 	dialog.setAccessoryView(customView);
 	
-	// Open dialog
+	// Open dialog and exit if user hits cancel.
 	
 	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
 	
-	// Load colors in target color picker section
+	// Get target picker section
 	
 	if (source.indexOfSelectedItem() == 0) {
-		app.globalAssets().addColors(colors);
+		var assets = app.globalAssets();
 	} else if (source.indexOfSelectedItem() == 1) {
-		doc.documentData().assets().addColors(colors);
+		var assets = doc.documentData().assets();
+	}
+		
+	// Append presets
+	
+	if (colors.length > 0) {
+		assets.addColors(colors);	
+	}
+	if (images.length > 0) {
+		var newImages = assets.images().slice().concat(images);
+		assets.setImages(newImages);	
 	}
 	
 	app.refreshCurrentDocument();
@@ -97,148 +130,11 @@ function loadPalette(context) {
 
 
 //-------------------------------------------------------------------------------------------------------------
-// Save  palette
+// Save palette
 //-------------------------------------------------------------------------------------------------------------
 
 
 function savePalette(context) {
-	
-	var doc = context.document;
-	var app = NSApp.delegate();
-	var version = context.plugin.version().UTF8String();
-	var target = "global";
-	
-	// Create dialog
-	
-	var dialog = NSAlert.alloc().init();
-	dialog.setMessageText("Save Palette");
-	dialog.addButtonWithTitle("Save");
-	dialog.addButtonWithTitle("Cancel");
-	
-	// Create view to hold custom fields
-	
-	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
-	
-	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Source:');
-	customView.addSubview(sourceLabel);
-
-	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
-	
-	// Add custom view to dialog
-	
-	dialog.setAccessoryView(customView);
-	
-	// Open dialog
-	
-	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
-
-	if (source.indexOfSelectedItem() == 0) {
-		var colors = app.globalAssets().colors();
-	} else if (source.indexOfSelectedItem() == 1) {
-		var colors = doc.documentData().assets().colors();
-	}
-	
-	// Only run if there are colors
-	
-	if (colors.length > 0) {	
-		
-		var save = NSSavePanel.savePanel();
-		save.setNameFieldStringValue("untitled.sketchpalette");
-		save.setAllowedFileTypes([@"sketchpalette"]);
-		save.setAllowsOtherFileTypes(false);
-		save.setExtensionHidden(false);
-		
-		// Open save dialog and run if Save was clicked
-		
-		if (save.runModal()) {
-			
-			// Convert MSColors to rgba
-			
-			var palette = [];
-			
-			for (var i = 0; i < colors.length; i++) {
-				palette.push({
-					red: colors[i].red(),
-					green: colors[i].green(),
-					blue: colors[i].blue(),
-					alpha: colors[i].alpha()	
-				});
-			};
-			
-			// Palette data
-
-			var fileData = {
-				"compatibleVersion": "1.4", // min plugin version to load palette
-				"pluginVersion": version, //  plugin version used to save palette
-				"colors": palette
-			}
-			
-			// Get chosen file path
-			
-			var filePath = save.URL().path();
-			
-			// Write file to specified file path
-			
-			var file = NSString.stringWithString(JSON.stringify(fileData));
-			
-			[file writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:null];
-
-		}
-		
-	} else { NSApp.displayDialog("No colors in palette!"); }
-
-}
-
-
-//-------------------------------------------------------------------------------------------------------------
-// Clear palette
-//-------------------------------------------------------------------------------------------------------------
-
-function clearPalette(context) {
-	
-	var doc = context.document;
-	var app = NSApp.delegate();
-	var version = context.plugin.version().UTF8String();
-	
-	// Create dialog
-	
-	var dialog = NSAlert.alloc().init();
-	dialog.setMessageText("Clear Palette");
-	dialog.addButtonWithTitle("Clear");
-	dialog.addButtonWithTitle("Cancel");
-	
-	// Create view to hold custom fields
-	
-	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
-	
-	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
-	customView.addSubview(sourceLabel);
-
-	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
-	
-	// Add custom view to dialog
-	
-	dialog.setAccessoryView(customView);
-	
-	// Open dialog and clear chosen palette
-	
-	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
-	
-	if (source.indexOfSelectedItem() == 0) {
-		app.globalAssets().setColors([]);
-	} else if (source.indexOfSelectedItem() == 1) {
-		doc.documentData().assets().setColors([]);
-	}
-	
-	app.refreshCurrentDocument();
-
-}
-
-
-
-function saveImages(context) {
 	
 	var doc = context.document;
 	var app = NSApp.delegate();
@@ -274,13 +170,15 @@ function saveImages(context) {
 	
 	// Get Presets from selected section
 	
+	
 	if (source.indexOfSelectedItem() == 0) {
-		colors = app.globalAssets().colors();
-		images = app.globalAssets().images();
+		var assets = app.globalAssets();
 	} else if (source.indexOfSelectedItem() == 1) {
-		colors = doc.documentData().assets().colors();
-		images = doc.documentData().assets().images();
+		var assets = doc.documentData().assets();
 	}
+	
+	colors = assets.colors();
+	images = assets.images();
 	
 	// Check to make sure there are presets available
 	
@@ -345,47 +243,52 @@ function saveImages(context) {
 }
 
 
+//-------------------------------------------------------------------------------------------------------------
+// Clear palette
+//-------------------------------------------------------------------------------------------------------------
 
 
-
-
-function loadImages(context) {
+function clearPalette(context) {
 	
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
-	var fileTypes = [NSArray arrayWithObjects:@"sketchpalette",nil];
 	
-	var open = NSOpenPanel.openPanel();
-	open.setAllowedFileTypes(fileTypes);
-	open.setCanChooseDirectories(true);
-	open.setCanChooseFiles(true);
-	open.setCanCreateDirectories(true);
-	open.setTitle("Choose a file");
-	open.setPrompt("Choose");
-	open.runModal();
+	// Create dialog
 	
-	// Read contents of file into NSString
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Clear Palette");
+	dialog.addButtonWithTitle("Clear");
+	dialog.addButtonWithTitle("Cancel");
 	
-	var filePath = open.URLs().firstObject().path();
-	var fileContents = NSString.stringWithContentsOfFile(filePath);
-	var filestring = fileContents.toString();
+	// Create view to hold custom fields
 	
-	// Convert base64 encoded string to NSImage, then to MSImageData
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
 	
-	var nsdata = NSData.alloc().initWithBase64EncodedString_options(filestring, 0);
-	var nsimage = NSImage.alloc().initWithData(nsdata);
-	var msimage = MSImageData.alloc().initWithImage_convertColorSpace(nsimage, false);
+	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
+	customView.addSubview(sourceLabel);
+
+	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(source);
 	
-	// Keept current images
-	// var currentImages = doc.documentData().assets().images().slice();
-	// var newImages = currentImages.concat([msimage]);
+	// Add custom view to dialog
 	
-	// doc.documentData().assets().setImages(newImages);
+	dialog.setAccessoryView(customView);
 	
-	var currentImages = app.globalAssets().images().slice();
-	var newImages = currentImages.concat([msimage]);
-	app.globalAssets().setImages(newImages);
+	// Open dialog and clear chosen palette
+	
+	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
+	
+	if (source.indexOfSelectedItem() == 0) {
+		var assets = app.globalAssets();
+	} else if (source.indexOfSelectedItem() == 1) {
+		var assets = doc.documentData().assets();
+	}
+	
+	assets.setColors([]);
+	assets.setImages([]);
+	
+	app.refreshCurrentDocument();
 
 }
 

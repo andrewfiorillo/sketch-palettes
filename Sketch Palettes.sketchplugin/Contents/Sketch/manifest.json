@@ -28,29 +28,13 @@
 			"shortcut": "",
 			"script": "sketchPalettes.js",
 			"handler": "clearPalette"
-		},
-		{
-			"name": "Save Images",
-			"identifier": "saveImages",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "saveImages"
-		},
-		{
-			"name": "Load Images",
-			"identifier": "loadImages",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "loadImages"
 		}
 	],
 	"menu": {
 		"items": [
 			"loadPalette",
 			"savePalette",
-			"clearPalette",
-			"saveImages",
-			"loadImages"
+			"clearPalette"
 		]
 	}
 }
