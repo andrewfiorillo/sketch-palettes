@@ -26,3 +26,15 @@ function createSelect(frame, items) {
 	select.addItemsWithTitles(items);
 	return select;
 }
+
+
+function createCheckbox(frame, name, value, onstate, enabled) {
+	var checkbox = NSButton.alloc().initWithFrame(frame);
+	checkbox.setButtonType(NSSwitchButton);
+	// checkbox.setBezelStyle(1);
+	checkbox.setTitle(name);
+	checkbox.setTag(value);
+	checkbox.setState(onstate ? NSOnState : NSOffState);
+	checkbox.setEnabled(enabled);
+	return checkbox;
+}
