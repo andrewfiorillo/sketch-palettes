@@ -25,47 +25,47 @@ function savePalette(context) {
 		
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 200, 180));
 	
-	var sourceLabel = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
-	customView.addSubview(sourceLabel);
+	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
+	customView.addSubview(labelSource);
 
-	var source = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(selectSource);
 
-	var fillTypesLabel = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
-	customView.addSubview(fillTypesLabel);
+	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
+	customView.addSubview(labelFillTypes);
 	
-	var colorsCheckbox = createCheckbox(NSMakeRect(0, 60, 200, 25), "Flat Colors", "colors", true, true);
-	customView.addSubview(colorsCheckbox);
+	var checkboxColors = createCheckbox(NSMakeRect(0, 60, 200, 25), "Flat Colors", "colors", true, true);
+	customView.addSubview(checkboxColors);
 	
-	var imagesCheckbox = createCheckbox(NSMakeRect(0, 37, 200, 25), "Pattern Fills", "images", true, true);
-	customView.addSubview(imagesCheckbox);
+	var checkboxImages = createCheckbox(NSMakeRect(0, 37, 200, 25), "Pattern Fills", "images", true, true);
+	customView.addSubview(checkboxImages);
 	
 	// Set checkboxes to disabled if no presets exist in selected section
 	
-	function setCheckboxStates(source) {
-		if (source.indexOfSelectedItem() == 0) {
+	function setCheckboxStates(selectSource) {
+		if (selectSource.indexOfSelectedItem() == 0) {
 			var assets = app.globalAssets();
-		} else if (source.indexOfSelectedItem() == 1) {
+		} else if (selectSource.indexOfSelectedItem() == 1) {
 			var assets = doc.documentData().assets();
 		}
 		
 		var showColors = (assets.colors().length > 0 ? true : false);
-		colorsCheckbox.setState(showColors ? NSOnState : NSOffState);
-		colorsCheckbox.setEnabled(showColors);
+		checkboxColors.setState(showColors ? NSOnState : NSOffState);
+		checkboxColors.setEnabled(showColors);
 		
 		var showImages = (assets.images().length > 0 ? true : false);
-		imagesCheckbox.setState(showImages ? NSOnState : NSOffState);
-		imagesCheckbox.setEnabled(showImages);
+		checkboxImages.setState(showImages ? NSOnState : NSOffState);
+		checkboxImages.setEnabled(showImages);
 	}
 	
 	// set initial chekcbox states
 	
-	setCheckboxStates(source);
+	setCheckboxStates(selectSource);
 	
 	// Listen for select box change event
 	
-	source.setCOSJSTargetFunction(function(sender) {
-		setCheckboxStates(source)
+	selectSource.setCOSJSTargetFunction(function(sender) {
+		setCheckboxStates(selectSource)
 	});
 	
 	// Add custom view to dialog
@@ -80,14 +80,14 @@ function savePalette(context) {
 	
 	// Get Presets from selected section
 	
-	if (source.indexOfSelectedItem() == 0) {
+	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = app.globalAssets();
-	} else if (source.indexOfSelectedItem() == 1) {
+	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
 	}
 	
-	colors = colorsCheckbox.state() ? assets.colors() : [];
-	images = imagesCheckbox.state() ? assets.images() : [];
+	colors = checkboxColors.state() ? assets.colors() : [];
+	images = checkboxImages.state() ? assets.images() : [];
 	
 	// Check to make sure there are presets available
 	
@@ -242,11 +242,11 @@ function loadPalette(context) {
 	
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
 	
-	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Load palette into:');
-	customView.addSubview(sourceLabel);
+	var labelSource = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Load palette into:');
+	customView.addSubview(labelSource);
 
-	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
+	var selectSource = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(selectSource);
 	
 	// Add custom view to dialog
 	
@@ -258,9 +258,9 @@ function loadPalette(context) {
 	
 	// Get target picker section
 	
-	if (source.indexOfSelectedItem() == 0) {
+	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = app.globalAssets();
-	} else if (source.indexOfSelectedItem() == 1) {
+	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
 	}
 		
@@ -301,11 +301,11 @@ function clearPalette(context) {
 	
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
 	
-	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
-	customView.addSubview(sourceLabel);
+	var labelSource = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
+	customView.addSubview(labelSource);
 
-	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
+	var selectSource = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(selectSource);
 	
 	// Add custom view to dialog
 	
@@ -315,9 +315,9 @@ function clearPalette(context) {
 	
 	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
 	
-	if (source.indexOfSelectedItem() == 0) {
+	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = app.globalAssets();
-	} else if (source.indexOfSelectedItem() == 1) {
+	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
 	}
 	
