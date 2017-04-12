@@ -3,6 +3,151 @@
 
 
 //-------------------------------------------------------------------------------------------------------------
+// Save palette
+//-------------------------------------------------------------------------------------------------------------
+
+
+function savePalette(context) {
+	
+	var doc = context.document;
+	var app = NSApp.delegate();
+	var version = context.plugin.version().UTF8String();
+	
+	// Create dialog
+	
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Save Palette");
+	dialog.addButtonWithTitle("Save");
+	dialog.addButtonWithTitle("Cancel");
+	
+	// Create custom view and fields
+		
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 200, 180));
+	
+	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
+	customView.addSubview(labelSource);
+
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(selectSource);
+
+	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
+	customView.addSubview(labelFillTypes);
+	
+	var checkboxColors = createCheckbox(NSMakeRect(0, 60, 200, 25), "Flat Colors", "colors", true, true);
+	customView.addSubview(checkboxColors);
+	
+	var checkboxImages = createCheckbox(NSMakeRect(0, 37, 200, 25), "Pattern Fills", "images", true, true);
+	customView.addSubview(checkboxImages);
+	
+	// Set checkboxes to disabled if no presets exist in selected section
+	
+	function setCheckboxStates(selectSource) {
+		if (selectSource.indexOfSelectedItem() == 0) {
+			var assets = app.globalAssets();
+		} else if (selectSource.indexOfSelectedItem() == 1) {
+			var assets = doc.documentData().assets();
+		}
+		
+		var showColors = (assets.colors().length > 0 ? true : false);
+		checkboxColors.setState(showColors ? NSOnState : NSOffState);
+		checkboxColors.setEnabled(showColors);
+		
+		var showImages = (assets.images().length > 0 ? true : false);
+		checkboxImages.setState(showImages ? NSOnState : NSOffState);
+		checkboxImages.setEnabled(showImages);
+	}
+	
+	// set initial chekcbox states
+	
+	setCheckboxStates(selectSource);
+	
+	// Listen for select box change event
+	
+	selectSource.setCOSJSTargetFunction(function(sender) {
+		setCheckboxStates(selectSource)
+	});
+	
+	// Add custom view to dialog
+
+	dialog.setAccessoryView(customView);
+	
+	// Open dialog and exit if user selects Cancel
+	
+	if (dialog.runModal() != NSAlertFirstButtonReturn) {
+		return;
+	}
+	
+	// Get Presets from selected section
+	
+	if (selectSource.indexOfSelectedItem() == 0) {
+		var assets = app.globalAssets();
+	} else if (selectSource.indexOfSelectedItem() == 1) {
+		var assets = doc.documentData().assets();
+	}
+	
+	var colors = checkboxColors.state() ? assets.colors() : [];
+	var images = checkboxImages.state() ? assets.images() : [];
+	
+	// Check to make sure there are presets available
+	
+	if (colors.length <= 0 && images.length <= 0) {
+		NSApp.displayDialog("No presets available!");
+		return;
+	}
+	
+	// Create save dialog
+	
+	var save = NSSavePanel.savePanel();
+	save.setNameFieldStringValue("untitled.sketchpalette");
+	save.setAllowedFileTypes(["sketchpalette"]);
+	save.setAllowsOtherFileTypes(false);
+	save.setExtensionHidden(false);
+		
+	// Open save dialog and run if Save was clicked
+	
+	if (save.runModal()) {
+		
+		// Build palettes
+		
+		var colorPalette = [], imagePalette = [];
+			
+		for (var i = 0; i < colors.length; i++) {
+			colorPalette.push({
+				red: colors[i].red(),
+				green: colors[i].green(),
+				blue: colors[i].blue(),
+				alpha: colors[i].alpha()	
+			});
+		};
+		
+		for (var i = 0; i < images.length; i++) {	
+			var data = images[i].data()
+			var nsdata = NSData.dataWithData(data);
+			var base64Color = nsdata.base64EncodedStringWithOptions(0).UTF8String();
+			imagePalette.push(base64Color);
+		};
+		
+		// Assemble file contents
+		
+		var fileData = {
+			"compatibleVersion": "1.4", // min plugin version to load palette
+			"pluginVersion": version, //  plugin version used to save palette
+			"colors": colorPalette,
+			"images":  imagePalette
+		}
+		
+		// Write file to chosen file path
+		
+		var filePath = save.URL().path();
+		var file = NSString.stringWithString(JSON.stringify(fileData));
+		
+		file.writeToFile_atomically_encoding_error(filePath, true, NSUTF8StringEncoding, null);
+
+	}
+}
+
+
+//-------------------------------------------------------------------------------------------------------------
 // Load palette
 //-------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +176,7 @@ function loadPalette(context) {
 	var fileContents = NSString.stringWithContentsOfFile(filePath);
 	var paletteContents = JSON.parse(fileContents.toString());
 	var compatibleVersion = paletteContents.compatibleVersion;
+	
 	var colorPalette = paletteContents.colors ? paletteContents.colors : [];
 	var gradientPalette = paletteContents.gradients ? paletteContents.gradients : [];
 	var imagePalette = paletteContents.images ? paletteContents.images : [];
@@ -92,11 +238,11 @@ function loadPalette(context) {
 	
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
 	
-	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Load palette into:');
-	customView.addSubview(sourceLabel);
+	var labelSource = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Load palette into:');
+	customView.addSubview(labelSource);
 
-	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
+	var selectSource = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(selectSource);
 	
 	// Add custom view to dialog
 	
@@ -108,9 +254,9 @@ function loadPalette(context) {
 	
 	// Get target picker section
 	
-	if (source.indexOfSelectedItem() == 0) {
+	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = app.globalAssets();
-	} else if (source.indexOfSelectedItem() == 1) {
+	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
 	}
 		
@@ -126,120 +272,6 @@ function loadPalette(context) {
 	
 	app.refreshCurrentDocument();
 	
-}
-
-
-//-------------------------------------------------------------------------------------------------------------
-// Save palette
-//-------------------------------------------------------------------------------------------------------------
-
-
-function savePalette(context) {
-	
-	var doc = context.document;
-	var app = NSApp.delegate();
-	var version = context.plugin.version().UTF8String();
-	var images = [], gradients = [], colors = [];
-	
-	// Create dialog
-	
-	var dialog = NSAlert.alloc().init();
-	dialog.setMessageText("Save Palette");
-	dialog.addButtonWithTitle("Save");
-	dialog.addButtonWithTitle("Cancel");
-	
-	// Create custom view and fields
-	
-	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
-	
-	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Source:');
-	customView.addSubview(sourceLabel);
-
-	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
-	
-	// Add custom view to dialog
-	
-	dialog.setAccessoryView(customView);
-	
-	// Open dialog and exit if user selects Cancel
-	
-	if (dialog.runModal() != NSAlertFirstButtonReturn) {
-		return;
-	}
-	
-	// Get Presets from selected section
-	
-	
-	if (source.indexOfSelectedItem() == 0) {
-		var assets = app.globalAssets();
-	} else if (source.indexOfSelectedItem() == 1) {
-		var assets = doc.documentData().assets();
-	}
-	
-	colors = assets.colors();
-	images = assets.images();
-	
-	// Check to make sure there are presets available
-	
-	if (colors.length < 0 && images.length < 0) {
-		NSApp.displayDialog("No presets available!");
-		return;
-	}
-	
-	// Create save dialog
-	
-	var save = NSSavePanel.savePanel();
-	save.setNameFieldStringValue("untitled.sketchpalette");
-	save.setAllowedFileTypes(["sketchpalette"]);
-	save.setAllowsOtherFileTypes(false);
-	save.setExtensionHidden(false);
-		
-	// Open save dialog and run if Save was clicked
-	
-	if (save.runModal()) {
-		
-		// Build color palette
-		
-		var colorPalette = [];
-			
-		for (var i = 0; i < colors.length; i++) {
-			colorPalette.push({
-				red: colors[i].red(),
-				green: colors[i].green(),
-				blue: colors[i].blue(),
-				alpha: colors[i].alpha()	
-			});
-		};
-		
-		// Build image palette
-		
-		var imagePalette = []
-		
-		for (var i = 0; i < images.length; i++) {	
-			var data = images[i].data()
-			var nsdata = NSData.dataWithData(data);
-			var base64Color = nsdata.base64EncodedStringWithOptions(0).UTF8String();
-			imagePalette.push(base64Color);
-		};
-		
-		// Assemble file contents
-		
-		var fileData = {
-			"compatibleVersion": "1.4", // min plugin version to load palette
-			"pluginVersion": version, //  plugin version used to save palette
-			"colors": colorPalette,
-			"images":  imagePalette
-		}
-		
-		// Write file to chosen file path
-		
-		var filePath = save.URL().path();
-		var file = NSString.stringWithString(JSON.stringify(fileData));
-		
-		file.writeToFile_atomically_encoding_error(filePath, true, NSUTF8StringEncoding, null);
-
-	}
 }
 
 
@@ -265,11 +297,11 @@ function clearPalette(context) {
 	
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
 	
-	var sourceLabel = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
-	customView.addSubview(sourceLabel);
+	var labelSource = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
+	customView.addSubview(labelSource);
 
-	var source = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
-	customView.addSubview(source);
+	var selectSource = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	customView.addSubview(selectSource);
 	
 	// Add custom view to dialog
 	
@@ -279,9 +311,9 @@ function clearPalette(context) {
 	
 	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
 	
-	if (source.indexOfSelectedItem() == 0) {
+	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = app.globalAssets();
-	} else if (source.indexOfSelectedItem() == 1) {
+	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
 	}
 	
