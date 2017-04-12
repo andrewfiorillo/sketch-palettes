@@ -12,7 +12,6 @@ function savePalette(context) {
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
-	var images = [], gradients = [], colors = [];
 	
 	// Create dialog
 	
@@ -86,12 +85,12 @@ function savePalette(context) {
 		var assets = doc.documentData().assets();
 	}
 	
-	colors = checkboxColors.state() ? assets.colors() : [];
-	images = checkboxImages.state() ? assets.images() : [];
+	var colors = checkboxColors.state() ? assets.colors() : [];
+	var images = checkboxImages.state() ? assets.images() : [];
 	
 	// Check to make sure there are presets available
 	
-	if (colors.length < 0 && images.length < 0) {
+	if (colors.length <= 0 && images.length <= 0) {
 		NSApp.displayDialog("No presets available!");
 		return;
 	}
@@ -108,9 +107,9 @@ function savePalette(context) {
 	
 	if (save.runModal()) {
 		
-		// Build color palette
+		// Build palettes
 		
-		var colorPalette = [];
+		var colorPalette = [], imagePalette = [];
 			
 		for (var i = 0; i < colors.length; i++) {
 			colorPalette.push({
@@ -120,10 +119,6 @@ function savePalette(context) {
 				alpha: colors[i].alpha()	
 			});
 		};
-		
-		// Build image palette
-		
-		var imagePalette = []
 		
 		for (var i = 0; i < images.length; i++) {	
 			var data = images[i].data()
@@ -181,6 +176,7 @@ function loadPalette(context) {
 	var fileContents = NSString.stringWithContentsOfFile(filePath);
 	var paletteContents = JSON.parse(fileContents.toString());
 	var compatibleVersion = paletteContents.compatibleVersion;
+	
 	var colorPalette = paletteContents.colors ? paletteContents.colors : [];
 	var gradientPalette = paletteContents.gradients ? paletteContents.gradients : [];
 	var imagePalette = paletteContents.images ? paletteContents.images : [];
