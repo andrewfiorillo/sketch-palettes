@@ -124,7 +124,7 @@ function savePalette(context) {
 			var data = images[i].data()
 			var nsdata = NSData.dataWithData(data);
 			var base64Color = nsdata.base64EncodedStringWithOptions(0).UTF8String();
-			imagePalette.push(base64Color);
+			imagePalette.push({data: base64Color});
 		};
 		
 		// Assemble file contents
@@ -202,7 +202,7 @@ function loadPalette(context) {
 		
 	} else {
 		
-		// Convert rgba colors to MSColors
+		// Colors Fills: convert rgba colors to MSColors
 		
 		if (colorPalette.length > 0) {
 			for (var i = 0; i < colorPalette.length; i++) {
@@ -215,11 +215,11 @@ function loadPalette(context) {
 			};	
 		}
 		
-		// convert base64 strings to MSImageData objects
+		// Pattern Fills: convert base64 strings to MSImageData objects
 		
 		if (imagePalette.length > 0) {
 			for (var i = 0; i < imagePalette.length; i++) {
-				var nsdata = NSData.alloc().initWithBase64EncodedString_options(imagePalette[i], 0);
+				var nsdata = NSData.alloc().initWithBase64EncodedString_options(imagePalette[i].data, 0);
 				var nsimage = NSImage.alloc().initWithData(nsdata);
 				var msimage = MSImageData.alloc().initWithImage_convertColorSpace(nsimage, false);
 				images.push(msimage);	
@@ -234,15 +234,26 @@ function loadPalette(context) {
 	dialog.addButtonWithTitle("Load");
 	dialog.addButtonWithTitle("Cancel");
 	
-	// Create view to hold custom fields
+	// Create custom view and fields
+		
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 200, 180));
 	
-	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
-	
-	var labelSource = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Load palette into:');
+	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
 	customView.addSubview(labelSource);
 
-	var selectSource = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
 	customView.addSubview(selectSource);
+
+	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
+	customView.addSubview(labelFillTypes);
+	
+	var showColors = (colorPalette.length > 0) ? true : false);
+	var checkboxColors = createCheckbox(NSMakeRect(0, 60, 200, 25), "Flat Colors", "colors", showColors, showColors);
+	customView.addSubview(checkboxColors);
+	
+	var showImages = (imagePalette.length > 0 ? true : false);
+	var checkboxImages = createCheckbox(NSMakeRect(0, 37, 200, 25), "Pattern Fills", "images", true, true);
+	customView.addSubview(checkboxImages);
 	
 	// Add custom view to dialog
 	
@@ -283,6 +294,7 @@ function loadPalette(context) {
 function clearPalette(context) {
 	
 	var doc = context.document;
+	var selection = context.selection;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
 	
@@ -295,21 +307,32 @@ function clearPalette(context) {
 	
 	// Create view to hold custom fields
 	
-	var customView = NSView.alloc().initWithFrame(NSMakeRect(0,0,200,80));
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 200, 180));
 	
-	var labelSource = createLabel(NSMakeRect(0, 50, 200, 25), 12, false, 'Clear palette in:');
+	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
 	customView.addSubview(labelSource);
 
-	var selectSource = createSelect(NSMakeRect(0, 25, 200, 25), ["Global Presets", "Document Presets"])
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
 	customView.addSubview(selectSource);
+
+	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
+	customView.addSubview(labelFillTypes);
+	
+	var checkboxColors = createCheckbox(NSMakeRect(0, 60, 200, 25), "Flat Colors", "colors", true, true);
+	customView.addSubview(checkboxColors);
+	
+	var checkboxImages = createCheckbox(NSMakeRect(0, 37, 200, 25), "Pattern Fills", "images", true, true);
+	customView.addSubview(checkboxImages);
 	
 	// Add custom view to dialog
 	
 	dialog.setAccessoryView(customView);
 	
-	// Open dialog and clear chosen palette
+	// Open dialog and exit if user hits cancel.
 	
 	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
+	
+	// Get target picker section
 	
 	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = app.globalAssets();
@@ -317,10 +340,15 @@ function clearPalette(context) {
 		var assets = doc.documentData().assets();
 	}
 	
-	assets.setColors([]);
-	assets.setImages([]);
+	if (checkboxColors.state()) {
+		assets.setColors([]);
+	}
+	if (checkboxImages.state()) {
+		assets.setImages([]);	
+	}
 	
 	app.refreshCurrentDocument();
+	// doc.currentPage().deselectAllLayers();
 
 }
 
