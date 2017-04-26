@@ -3,10 +3,10 @@
 	"description": "Plugin to load palettes into color picker",
 	"author": "Andrew Fiorillo",
 	"homepage": "http://github.com/andrewfiorillo/sketch-palettes",
-	"version": "1.5",
+	"version": "2.0",
 	"identifier": "com.andrewfiorillo.sketch.sketch-palettes",
 	"compatibleVersion": "39",
-	"bundleVersion": "1.5",
+	"bundleVersion": "2.0",
 	"commands": [
 		{
 			"name": "Load Palette...",
