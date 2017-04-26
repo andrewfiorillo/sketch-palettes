@@ -165,7 +165,7 @@ function savePalette(context) {
 		// Assemble file contents
 		
 		var fileData = {
-			"compatibleVersion": "1.4", // min plugin version to load palette
+			"compatibleVersion": "2.0", // min plugin version to load palette
 			"pluginVersion": version, //  plugin version used to save palette
 			"colors": colorPalette,
 			"gradients": gradientPalette,
