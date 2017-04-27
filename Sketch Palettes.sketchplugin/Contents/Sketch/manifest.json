@@ -3,79 +3,38 @@
 	"description": "Plugin to load palettes into color picker",
 	"author": "Andrew Fiorillo",
 	"homepage": "http://github.com/andrewfiorillo/sketch-palettes",
-	"version": "1.5",
+	"version": "2.0",
 	"identifier": "com.andrewfiorillo.sketch.sketch-palettes",
 	"compatibleVersion": "39",
-	"bundleVersion": "1.5",
+	"bundleVersion": "2.0",
 	"commands": [
-	
-	
 		{
 			"name": "Load Palette...",
-			"identifier": "loadDocumentPalette",
+			"identifier": "loadPalette",
 			"shortcut": "",
 			"script": "sketchPalettes.js",
-			"handler": "loadDocumentPalette"
+			"handler": "loadPalette"
 		},
 		{
 			"name": "Save Palette...",
-			"identifier": "saveDocumentPalette",
+			"identifier": "savePalette",
 			"shortcut": "",
 			"script": "sketchPalettes.js",
-			"handler": "saveDocumentPalette"
+			"handler": "savePalette"
 		},
 		{
-			"name": "Clear Palette",
-			"identifier": "clearDocumentPalette",
+			"name": "Clear Palette...",
+			"identifier": "clearPalette",
 			"shortcut": "",
 			"script": "sketchPalettes.js",
-			"handler": "clearDocumentPalette"
-		},
-		
-		
-		
-		{
-			"name": "Load Palette...",
-			"identifier": "loadGlobalPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "loadGlobalPalette"
-		},
-		{
-			"name": "Save Palette...",
-			"identifier": "saveGlobalPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "saveGlobalPalette"
-		},
-		{
-			"name": "Clear Palette",
-			"identifier": "clearGlobalPalette",
-			"shortcut": "",
-			"script": "sketchPalettes.js",
-			"handler": "clearGlobalPalette"
+			"handler": "clearPalette"
 		}
-		
-		
 	],
 	"menu": {
 		"items": [
-			{
-				"title": "Document Colors",
-				"items": [
-					"loadDocumentPalette",
-					"saveDocumentPalette",
-					"clearDocumentPalette"
-				],
-			},
-			{
-				"title": "Global Colors",
-				"items": [
-					"loadGlobalPalette",
-					"saveGlobalPalette",
-					"clearGlobalPalette"
-				],
-			}
+			"loadPalette",
+			"savePalette",
+			"clearPalette"
 		]
 	}
 }
