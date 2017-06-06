@@ -217,8 +217,8 @@ function loadPalette(context) {
 	// Check for older hex code palette version
 	if (!compatibleVersion || compatibleVersion < 1.4) {
 		// Convert hex colors to MSColors
-		for (var i = 0; i < palette.length; i++) {
-			colors.push(MSImmutableColor.colorWithSVGString(palette[i]).newMutableCounterpart());
+		for (var i = 0; i < colorPalette.length; i++) {
+			colors.push(MSImmutableColor.colorWithSVGString(colorPalette[i]).newMutableCounterpart());
 		}
 	} else {
 		
