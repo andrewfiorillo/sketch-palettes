@@ -7,6 +7,7 @@
 	"identifier": "com.andrewfiorillo.sketch.sketch-palettes",
 	"compatibleVersion": "39",
 	"bundleVersion": "2.0",
+	"appcast": "https://raw.githubusercontent.com/andrewfiorillo/sketch-palettes/master/appcast.xml",
 	"commands": [
 		{
 			"name": "Load Palette...",
