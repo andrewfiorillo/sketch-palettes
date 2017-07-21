@@ -6,7 +6,7 @@
 		<description>A Sketch plugin for exporting and importing fill presets. It supports colors, gradients, and pattern fills.</description>
 		<language>en</language>
 		<item>
-			<title>Version 2.20</title>
+			<title>Version 2.10</title>
 			<description>
 				<![CDATA[
 				<ul>
@@ -15,7 +15,7 @@
 				</ul>
 				]]>
 			</description>
-			<enclosure url="https://github.com/andrewfiorillo/sketch-palettes/archive/2.10.zip" sparkle:version="2.20" />
+			<enclosure url="https://github.com/andrewfiorillo/sketch-palettes/archive/2.10.zip" sparkle:version="2.10" />
 		</item>
 	</channel>
 </rss>
