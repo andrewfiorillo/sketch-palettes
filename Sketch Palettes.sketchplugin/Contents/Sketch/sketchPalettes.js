@@ -184,7 +184,7 @@ function loadPalette(context) {
 	var app = NSApp.delegate();
 	var doc = context.document;
 	var version = context.plugin.version().UTF8String();
-	var fileTypes = [NSArray arrayWithObjects:@"sketchpalette",nil];
+	var fileTypes = ["sketchpalette"];
 		
 	// Open file picker to choose palette file
 	var open = NSOpenPanel.openPanel();
