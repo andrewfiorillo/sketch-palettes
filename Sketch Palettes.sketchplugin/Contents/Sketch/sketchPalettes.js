@@ -25,7 +25,7 @@ function savePalette(context) {
 	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
 	customView.addSubview(labelSource);
 
-	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Document Presets", "Global Presets"])
 	customView.addSubview(selectSource);
 
 	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
@@ -43,9 +43,9 @@ function savePalette(context) {
 	// Set checkboxes to disabled if no presets exist in selected section
 	function setCheckboxStates(selectSource) {
 		if (selectSource.indexOfSelectedItem() == 0) {
-			var assets = app.globalAssets();
-		} else if (selectSource.indexOfSelectedItem() == 1) {
 			var assets = doc.documentData().assets();
+		} else if (selectSource.indexOfSelectedItem() == 1) {
+			var assets = app.globalAssets();
 		}
 		
 		var showColors = (assets.colors().length > 0 ? true : false);
@@ -79,9 +79,9 @@ function savePalette(context) {
 	
 	// Get Presets from selected section
 	if (selectSource.indexOfSelectedItem() == 0) {
-		var assets = app.globalAssets();
-	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
+	} else if (selectSource.indexOfSelectedItem() == 1) {
+		var assets = app.globalAssets();
 	}
 	
 	var colors = checkboxColors.state() ? assets.colors() : [];
@@ -239,7 +239,8 @@ function loadPalette(context) {
 			for (var i = 0; i < imagePalette.length; i++) {
 				var nsdata = NSData.alloc().initWithBase64EncodedString_options(imagePalette[i].data, 0);
 				var nsimage = NSImage.alloc().initWithData(nsdata);
-				var msimage = MSImageData.alloc().initWithImage_convertColorSpace(nsimage, false);
+				// var msimage = MSImageData.alloc().initWithImageConvertingColorSpace(nsimage);
+				var msimage = MSImageData.alloc().initWithImage(nsimage);
 				images.push(msimage);	
 			};
 		}
@@ -295,7 +296,7 @@ function loadPalette(context) {
 	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
 	customView.addSubview(labelSource);
 
-	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Document Presets", "Global Presets"])
 	customView.addSubview(selectSource);
 
 	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
@@ -321,9 +322,9 @@ function loadPalette(context) {
 	
 	// Get target picker section
 	if (selectSource.indexOfSelectedItem() == 0) {
-		var assets = app.globalAssets();
-	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
+	} else if (selectSource.indexOfSelectedItem() == 1) {
+		var assets = app.globalAssets();
 	}
 	
 	// Append presets
@@ -361,7 +362,7 @@ function clearPalette(context) {
 	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
 	customView.addSubview(labelSource);
 
-	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Global Presets", "Document Presets"])
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Document Presets", "Global Presets"])
 	customView.addSubview(selectSource);
 
 	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
@@ -384,9 +385,9 @@ function clearPalette(context) {
 	
 	// Get target picker section
 	if (selectSource.indexOfSelectedItem() == 0) {
-		var assets = app.globalAssets();
-	} else if (selectSource.indexOfSelectedItem() == 1) {
 		var assets = doc.documentData().assets();
+	} else if (selectSource.indexOfSelectedItem() == 1) {
+		var assets = app.globalAssets();
 	}
 	
 	// Clear presets in chosen sections
