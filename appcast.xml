@@ -6,16 +6,15 @@
 		<description>A Sketch plugin for exporting and importing fill presets. It supports colors, gradients, and pattern fills.</description>
 		<language>en</language>
 		<item>
-			<title>Version 2.13</title>
+			<title>Version 2.14</title>
 			<description>
 				<![CDATA[
 				<ul>
-					<li>Fixed loading bug introduced in Sketch 47.</li>
-					<li>Changed default select state to Document Presets instead of Global Presets</li>
+					<li>Fixed bug introduced in Sketch 49.</li>
 				</ul>
 				]]>
 			</description>
-			<enclosure url="https://github.com/andrewfiorillo/sketch-palettes/archive/2.13.zip" sparkle:version="2.13" />
+			<enclosure url="https://github.com/andrewfiorillo/sketch-palettes/archive/2.14.zip" sparkle:version="2.14" />
 		</item>
 	</channel>
 </rss>
