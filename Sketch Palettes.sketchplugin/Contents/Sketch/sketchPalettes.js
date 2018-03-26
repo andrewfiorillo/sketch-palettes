@@ -142,14 +142,15 @@ function savePalette(context) {
 					position: gradients[i].stops()[j].position()
 				});
 			}
+			
 			gradientPalette.push({
 				_class: "gradient",
 				elipseLength: gradients[i].elipseLength(),
 				from: "{" + gradients[i].from().x + "," + gradients[i].from().y + "}",
 				to: "{" + gradients[i].to().x + "," + gradients[i].to().y + "}",
 				stops: gradient_stops,
-				gradientType: gradients[i].gradientType(),
-				shouldSmoothenOpacity: gradients[i].shouldSmoothenOpacity() ? true : false
+				gradientType: gradients[i].gradientType()
+				// shouldSmoothenOpacity: gradients[i].shouldSmoothenOpacity() ? true : false
 			});
 		}
 		
@@ -265,7 +266,7 @@ function loadPalette(context) {
 				// Create gradient object and set basic properties
 				var msgradient = MSGradient.new();
 				msgradient.setGradientType(gradient.gradientType);
-				msgradient.shouldSmoothenOpacity = gradient.shouldSmoothenOpacity;
+				// msgradient.shouldSmoothenOpacity = gradient.shouldSmoothenOpacity;
 				msgradient.elipseLength = gradient.elipseLength;
 				msgradient.setStops(stops);
 
