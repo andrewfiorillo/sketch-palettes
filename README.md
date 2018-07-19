@@ -6,7 +6,7 @@ A Sketch plugin for exporting and importing fill presets. It supports colors, gr
 
 # Installation
 
-Move the Sketch Palettes plugin into your Plugins folder or double-click the .sketchplugin file.
+Refer to the official sketch plugin installation [documentation](https://developer.sketchapp.com/guides/installing-plugins/#installing-plugins)
 
 # Usage
 
