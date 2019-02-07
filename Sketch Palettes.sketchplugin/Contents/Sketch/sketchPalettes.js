@@ -109,7 +109,9 @@ function savePalette(context) {
 
 		// Colors
 		for (var i = 0; i < colorAssets.length; i++) {
+			var colorName = colorAssets[i].name() ? colorAssets[i].name().UTF8String() : null
 			colorPalette.push({
+				name: colorName,
 				red: colorAssets[i].color().red(),
 				green: colorAssets[i].color().green(),
 				blue: colorAssets[i].color().blue(),
@@ -142,8 +144,9 @@ function savePalette(context) {
 					position: gradientAssets[i].gradient().stops()[j].position()
 				});
 			}
-
+			var gradientName = gradientAssets[i].name() ? gradientAssets[i].name().UTF8String() : null
 			gradientPalette.push({
+				name: gradientName,
 				_class: "gradient",
 				elipseLength: gradientAssets[i].gradient().elipseLength(),
 				from: "{" + gradientAssets[i].gradient().from().x + "," + gradientAssets[i].gradient().from().y + "}",
@@ -226,13 +229,14 @@ function loadPalette(context) {
 		// Colors Fills: convert rgba colors to MSColors
 		if (colorPalette.length > 0) {
 			for (var i = 0; i < colorPalette.length; i++) {
+				var colorName = colorPalette[i].name ? colorPalette[i].name : null;
 				var mscolor = MSColor.colorWithRed_green_blue_alpha(
 					colorPalette[i].red,
 					colorPalette[i].green,
 					colorPalette[i].blue,
 					colorPalette[i].alpha
 				);
-				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, null));
+				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, colorName));
 			}
 		}
 
@@ -279,7 +283,8 @@ function loadPalette(context) {
 				msgradient.setFrom({ x: fromValue[0], y: fromValue[1] });
 				msgradient.setTo({ x: toValue[0], y: toValue[1] });
 
-				gradientAssets.push(MSGradientAsset.alloc().initWithAsset_name(msgradient, null));
+				var gradientName = gradientPalette[i].name ? gradientPalette[i].name : null;
+				gradientAssets.push(MSGradientAsset.alloc().initWithAsset_name(msgradient, gradientName));
 
 			}
 		}
