@@ -48,11 +48,11 @@ function savePalette(context) {
 			var assets = app.globalAssets();
 		}
 
-		var showColors = (assets.colors().length > 0 ? true : false);
+		var showColors = (assets.colorAssets().length > 0 ? true : false);
 		checkboxColors.setState(showColors ? NSOnState : NSOffState);
 		checkboxColors.setEnabled(showColors);
 
-		var showGradients = (assets.gradients().length > 0 ? true : false);
+		var showGradients = (assets.gradientAssets().length > 0 ? true : false);
 		checkboxGradients.setState(showGradients ? NSOnState : NSOffState);
 		checkboxGradients.setEnabled(showGradients);
 
@@ -84,12 +84,12 @@ function savePalette(context) {
 		var assets = app.globalAssets();
 	}
 
-	var colors = checkboxColors.state() ? assets.colors() : [];
-	var gradients = checkboxGradients.state() ? assets.gradients() : [];
+	var colorAssets = checkboxColors.state() ? assets.colorAssets() : [];
+	var gradientAssets = checkboxGradients.state() ? assets.gradientAssets() : [];
 	var images = checkboxImages.state() ? assets.images() : [];
 
 	// Check to make sure there are presets available
-	if (colors.length <= 0 && images.length <= 0 && gradients.length <= 0) {
+	if (colorAssets.length <= 0 && images.length <= 0 && gradientAssets.length <= 0) {
 		NSApp.displayDialog("No presets available!");
 		return;
 	}
@@ -108,12 +108,12 @@ function savePalette(context) {
 		var colorPalette = [], gradientPalette = [], imagePalette = [];
 
 		// Colors
-		for (var i = 0; i < colors.length; i++) {
+		for (var i = 0; i < colorAssets.length; i++) {
 			colorPalette.push({
-				red: colors[i].red(),
-				green: colors[i].green(),
-				blue: colors[i].blue(),
-				alpha: colors[i].alpha()
+				red: colorAssets[i].color().red(),
+				green: colorAssets[i].color().green(),
+				blue: colorAssets[i].color().blue(),
+				alpha: colorAssets[i].color().alpha()
 			});
 		}
 
@@ -126,30 +126,30 @@ function savePalette(context) {
 		}
 
 		// Gradients
-		for (var i = 0; i < gradients.length; i++) {
+		for (var i = 0; i < gradientAssets.length; i++) {
 			var gradient_stops = [];
-			for (var j = 0; j < gradients[i].stops().length; j++) {
+			for (var j = 0; j < gradientAssets[i].gradient().stops().length; j++) {
 				stop_color = {
 					_class: "color",
-					red: gradients[i].stops()[j].color().red(),
-					green: gradients[i].stops()[j].color().green(),
-					blue: gradients[i].stops()[j].color().blue(),
-					alpha: gradients[i].stops()[j].color().alpha()
+					red: gradientAssets[i].gradient().stops()[j].color().red(),
+					green: gradientAssets[i].gradient().stops()[j].color().green(),
+					blue: gradientAssets[i].gradient().stops()[j].color().blue(),
+					alpha: gradientAssets[i].gradient().stops()[j].color().alpha()
 				};
 				gradient_stops.push({
 					_class: "gradientStop",
 					color: stop_color,
-					position: gradients[i].stops()[j].position()
+					position: gradientAssets[i].gradient().stops()[j].position()
 				});
 			}
 
 			gradientPalette.push({
 				_class: "gradient",
-				elipseLength: gradients[i].elipseLength(),
-				from: "{" + gradients[i].from().x + "," + gradients[i].from().y + "}",
-				to: "{" + gradients[i].to().x + "," + gradients[i].to().y + "}",
+				elipseLength: gradientAssets[i].gradient().elipseLength(),
+				from: "{" + gradientAssets[i].gradient().from().x + "," + gradientAssets[i].gradient().from().y + "}",
+				to: "{" + gradientAssets[i].gradient().to().x + "," + gradientAssets[i].gradient().to().y + "}",
 				stops: gradient_stops,
-				gradientType: gradients[i].gradientType()
+				gradientType: gradientAssets[i].gradient().gradientType()
 				// shouldSmoothenOpacity: gradients[i].shouldSmoothenOpacity() ? true : false
 			});
 		}
