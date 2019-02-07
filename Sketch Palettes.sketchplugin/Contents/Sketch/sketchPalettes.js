@@ -81,7 +81,7 @@ function savePalette(context) {
 	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = doc.documentData().assets();
 	} else if (selectSource.indexOfSelectedItem() == 1) {
-		MSPersistentAssetCollection.sharedGlobalAssets();
+		var assets = MSPersistentAssetCollection.sharedGlobalAssets();
 	}
 
 	var colorAssets = checkboxColors.state() ? assets.colorAssets() : [];
