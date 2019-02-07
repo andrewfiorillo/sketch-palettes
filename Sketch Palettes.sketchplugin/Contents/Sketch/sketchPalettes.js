@@ -45,7 +45,7 @@ function savePalette(context) {
 		if (selectSource.indexOfSelectedItem() == 0) {
 			var assets = doc.documentData().assets();
 		} else if (selectSource.indexOfSelectedItem() == 1) {
-			var assets = app.globalAssets();
+			var assets = MSPersistentAssetCollection.sharedGlobalAssets();
 		}
 
 		var showColors = (assets.colorAssets().length > 0 ? true : false);
@@ -81,7 +81,7 @@ function savePalette(context) {
 	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = doc.documentData().assets();
 	} else if (selectSource.indexOfSelectedItem() == 1) {
-		var assets = app.globalAssets();
+		MSPersistentAssetCollection.sharedGlobalAssets();
 	}
 
 	var colorAssets = checkboxColors.state() ? assets.colorAssets() : [];
@@ -326,7 +326,7 @@ function loadPalette(context) {
 	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = doc.documentData().assets();
 	} else if (selectSource.indexOfSelectedItem() == 1) {
-		var assets = app.globalAssets();
+		var assets = MSPersistentAssetCollection.sharedGlobalAssets();
 	}
 
 	// Append presets
@@ -389,7 +389,7 @@ function clearPalette(context) {
 	if (selectSource.indexOfSelectedItem() == 0) {
 		var assets = doc.documentData().assets();
 	} else if (selectSource.indexOfSelectedItem() == 1) {
-		var assets = app.globalAssets();
+		var assets = MSPersistentAssetCollection.sharedGlobalAssets();
 	}
 
 	// Clear presets in chosen sections
