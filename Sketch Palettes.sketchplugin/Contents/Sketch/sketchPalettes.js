@@ -279,7 +279,7 @@ function loadPalette(context) {
 				msgradient.setFrom({ x: fromValue[0], y: fromValue[1] });
 				msgradient.setTo({ x: toValue[0], y: toValue[1] });
 
-				gradientAssets.push(MSGradientAsset.alloc().initWithAsset_name(msgradient, ''));
+				gradientAssets.push(MSGradientAsset.alloc().initWithAsset_name(msgradient, null));
 
 			}
 		}
