@@ -232,7 +232,7 @@ function loadPalette(context) {
 					colorPalette[i].blue,
 					colorPalette[i].alpha
 				);
-				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, ''));
+				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, null));
 			}
 		}
 
