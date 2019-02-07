@@ -393,9 +393,9 @@ function clearPalette(context) {
 	}
 
 	// Clear presets in chosen sections
-	if (checkboxColors.state()) assets.setColors([]);
+	if (checkboxColors.state()) assets.setColorAssets([]);
 	if (checkboxImages.state()) assets.setImages([]);
-	if (checkboxGradients.state()) assets.setGradients([]);
+	if (checkboxGradients.state()) assets.setGradientAssets([]);
 
 	doc.inspectorController().closeAnyColorPopover();
 	app.refreshCurrentDocument();
