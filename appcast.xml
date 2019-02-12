@@ -6,16 +6,16 @@
 		<description>A Sketch plugin for exporting and importing fill presets. It supports colors, gradients, and pattern fills.</description>
 		<language>en</language>
 		<item>
-			<title>Version 2.2</title>
+			<title>Version 2.21</title>
 			<description>
 				<![CDATA[
 				<ul>
-					<li>Added support for preset names.</li>
-					<li>Fixes for Sketch 53</li>
+					<li>Added support for saving preset names with palette.</li>
+					<li>Added libraries as a source for saving palettes</li>
 				</ul>
 				]]>
 			</description>
-			<enclosure url="https://github.com/andrewfiorillo/sketch-palettes/archive/2.2.zip" sparkle:version="2.2" />
+			<enclosure url="https://github.com/andrewfiorillo/sketch-palettes/archive/2.21.zip" sparkle:version="2.21" />
 		</item>
 	</channel>
 </rss>
