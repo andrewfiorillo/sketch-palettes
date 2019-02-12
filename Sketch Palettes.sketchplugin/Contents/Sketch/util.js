@@ -23,7 +23,13 @@ function createLabel(frame, size, bold, text) {
 
 function createSelect(frame, items) {
 	var select = NSPopUpButton.alloc().initWithFrame(frame);
-	select.addItemsWithTitles(items);
+	for (var i = 0; i < items.length; i++) {
+		if (items[i] == "--") {
+			select.menu().addItem(NSMenuItem.separatorItem())
+		} else {
+			select.addItemWithTitle(items[i])
+		}
+	}
 	return select;
 }
 

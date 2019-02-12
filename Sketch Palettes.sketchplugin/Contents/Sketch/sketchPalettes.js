@@ -12,6 +12,27 @@ function savePalette(context) {
 	var doc = context.document;
 	var app = NSApp.delegate();
 	var version = context.plugin.version().UTF8String();
+	var assets;
+	
+	// Preset sources
+	var sources = [
+		{ name: "Global Presets", assets: MSPersistentAssetCollection.sharedGlobalAssets()},
+		{ name: "Document Presets", assets: doc.documentData().assets()},
+	];
+	var sourceNames = [ sources[0].name, sources[1].name ];
+	var libs = app.librariesController().availableLibraries();
+
+	// Add presets from libraries, if any, to preset sources
+	if (libs.length > 0) {
+		sourceNames.push("--");
+		for (var i = 0; i < libs.length; i++) {
+			var libAssets = libs[i].document().assets();
+			if (libAssets.colorAssets().length > 0 || libAssets.gradientAssets().length > 0) {
+				sources.push({ name: libs[i].name(), assets: libAssets });
+				sourceNames.push(libs[i].name())
+			}
+		}
+	}
 
 	// Create dialog
 	var dialog = NSAlert.alloc().init();
@@ -25,7 +46,7 @@ function savePalette(context) {
 	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
 	customView.addSubview(labelSource);
 
-	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), ["Document Presets", "Global Presets"])
+	var selectSource = createSelect(NSMakeRect(0, 125, 200, 25), sourceNames)
 	customView.addSubview(selectSource);
 
 	var labelFillTypes = createLabel(NSMakeRect(0, 83, 200, 25), 12, false, 'Fill Types:');
@@ -42,10 +63,12 @@ function savePalette(context) {
 
 	// Set checkboxes to disabled if no presets exist in selected section
 	function setCheckboxStates(selectSource) {
-		if (selectSource.indexOfSelectedItem() == 0) {
-			var assets = doc.documentData().assets();
-		} else if (selectSource.indexOfSelectedItem() == 1) {
-			var assets = MSPersistentAssetCollection.sharedGlobalAssets();
+
+		// var assets;
+		for (var i = 0; i < sources.length; i++) {
+			if (selectSource.titleOfSelectedItem() == sources[i].name) {
+				assets = sources[i].assets;
+			}
 		}
 
 		var showColors = (assets.colorAssets().length > 0 ? true : false);
@@ -78,11 +101,11 @@ function savePalette(context) {
 	}
 
 	// Get Presets from selected section
-	if (selectSource.indexOfSelectedItem() == 0) {
-		var assets = doc.documentData().assets();
-	} else if (selectSource.indexOfSelectedItem() == 1) {
-		var assets = MSPersistentAssetCollection.sharedGlobalAssets();
-	}
+	// if (selectSource.indexOfSelectedItem() == 0) {
+	// 	assets = doc.documentData().assets();
+	// } else if (selectSource.indexOfSelectedItem() == 1) {
+	// 	assets = MSPersistentAssetCollection.sharedGlobalAssets();
+	// }
 
 	var colorAssets = checkboxColors.state() ? assets.colorAssets() : [];
 	var gradientAssets = checkboxGradients.state() ? assets.gradientAssets() : [];
