@@ -362,7 +362,7 @@ function loadPalette(context) {
 	if (images.length > 0) assets.setImages(assets.images().slice().concat(images));
 	if (gradientAssets.length > 0) assets.addGradientAssets(gradientAssets);
 
-	doc.inspectorController().closeAnyColorPopover();
+	doc.inspectorController().reload();
 	app.refreshCurrentDocument();
 
 }
@@ -425,7 +425,7 @@ function clearPalette(context) {
 	if (checkboxImages.state()) assets.setImages([]);
 	if (checkboxGradients.state()) assets.setGradientAssets([]);
 
-	doc.inspectorController().closeAnyColorPopover();
+	doc.inspectorController().reload();
 	app.refreshCurrentDocument();
 
 }
