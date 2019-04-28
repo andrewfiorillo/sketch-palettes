@@ -3,9 +3,9 @@
 	"description": "A Sketch plugin for exporting and importing fill presets. It supports colors, gradients, and pattern fills.",
 	"author": "Andrew Fiorillo",
 	"homepage": "http://github.com/andrewfiorillo/sketch-palettes",
-	"version": "2.21",
+	"version": "2.22",
 	"identifier": "com.andrewfiorillo.sketch.sketch-palettes",
-	"compatibleVersion": "53",
+	"compatibleVersion": "54.1",
 	"bundleVersion": "2.0",
 	"appcast": "https://raw.githubusercontent.com/andrewfiorillo/sketch-palettes/master/appcast.xml",
 	"commands": [
