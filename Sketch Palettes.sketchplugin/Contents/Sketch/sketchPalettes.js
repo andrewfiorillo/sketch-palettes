@@ -1,7 +1,6 @@
 
 @import "util.js";
 
-
 //-------------------------------------------------------------------------------------------------------------
 // Save palette
 //-------------------------------------------------------------------------------------------------------------
@@ -201,6 +200,8 @@ function savePalette(context) {
 }
 
 
+
+
 //-------------------------------------------------------------------------------------------------------------
 // Load palette
 //-------------------------------------------------------------------------------------------------------------
@@ -367,6 +368,105 @@ function loadPalette(context) {
 
 }
 
+//-------------------------------------------------------------------------------------------------------------
+// Load palette URL
+//-------------------------------------------------------------------------------------------------------------
+
+/**
+ * Fetch JSON from a given URL
+ */
+function networkRequest(args) {
+	var task = NSTask.alloc().init();
+	task.setLaunchPath("/usr/bin/curl");
+	task.setArguments(args);
+	var outputPipe = [NSPipe pipe];
+	[task setStandardOutput:outputPipe];
+	task.launch();
+	var responseData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
+	var responseString = [[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]];
+	var parsed = tryParseJSON(responseString);
+	if(!parsed) {
+	  log("Error invoking curl");
+	  log("args:");
+	  log(args);
+	  log("responseString");
+	  log(responseString);
+	  throw "Error communicating with server"
+	}
+	return parsed;
+  }
+
+  function tryParseJSON (jsonString){
+  try {
+    var o = JSON.parse(jsonString);
+
+    // Handle non-exception-throwing cases:
+    // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
+    // but... JSON.parse(null) returns 'null', and typeof null === "object",
+    // so we must check for that, too.
+    if (o && typeof o === "object" && o !== null) {
+      return o;
+    }
+  }
+  catch (e) { }
+
+  return false;
+}
+
+function loadPaletteUrl(context) {
+
+	// Create dialog
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Load URL");
+	dialog.addButtonWithTitle("Load");
+	dialog.addButtonWithTitle("Cancel");
+
+	// Create view to hold custom fields
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 200, 180));
+
+	var labelSource = createInput(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
+	customView.addSubview(labelSource);
+
+	// Add custom view to dialog
+	dialog.setAccessoryView(customView);
+
+	// Open dialog and exit if user hits cancel.
+	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
+
+	const data = networkRequest([labelSource.stringValue()]);
+
+	if( !data || data === '' ) {
+		NSApp.displayDialog("No valid api!");
+	}
+
+	var colorPalette = Object.keys(data.colors);
+	var colorAssets = [];
+
+	// Colors Fills: convert rgba colors to MSColors
+	if (colorPalette.length > 0) {
+		for (var i = 0; i < colorPalette.length; i++) {
+			var colorId = colorPalette[i];
+			var color = data.colors[colorId];
+
+			if (color) {
+				var mscolor = MSColor.colorWithRed_green_blue_alpha(
+					color.rgb.r / 255,
+					color.rgb.g / 255,
+					color.rgb.b / 255,
+					1
+				);
+
+				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, color.name));
+			}
+		}
+	}
+
+	// Get target picker section
+	var doc = context.document;
+	var assets = doc.documentData().assets();
+
+	if (colorAssets.length > 0) assets.addColorAssets(colorAssets);
+}
 
 //-------------------------------------------------------------------------------------------------------------
 // Clear palette

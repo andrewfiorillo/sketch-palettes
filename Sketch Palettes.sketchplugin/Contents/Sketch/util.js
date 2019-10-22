@@ -33,6 +33,9 @@ function createSelect(frame, items) {
 	return select;
 }
 
+function createInput(frame, name, value, onstate, enabled) {
+	return NSTextField.alloc().initWithFrame(frame);
+}
 
 function createCheckbox(frame, name, value, onstate, enabled) {
 	var checkbox = NSButton.alloc().initWithFrame(frame);
