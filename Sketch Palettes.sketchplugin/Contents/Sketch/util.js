@@ -4,6 +4,31 @@ function rect(x,y,w,h) {
 	return rect;
 }
 
+/**
+ * Parses hexadecimal color into RGB format
+ */
+function hexToRgb (hex) {
+	return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+		,(m, r, g, b) => '#' + r + r + g + g + b + b)
+		.substring(1).match(/.{2}/g)
+		.map(x => parseInt(x, 16))
+}
+
+/**
+ * Fetch JSON from a given URL
+ */
+function fetch(args) {
+	var task = NSTask.alloc().init();
+	task.setLaunchPath("/usr/bin/curl");
+	task.setArguments(args);
+	var outputPipe = [NSPipe pipe];
+	[task setStandardOutput:outputPipe];
+	task.launch();
+	var responseData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
+
+	return [[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]];
+}
+
 function createLabel(frame, size, bold, text) {
 	var label = NSTextField.alloc().initWithFrame(frame);	
 	label.setStringValue(text);
@@ -33,6 +58,11 @@ function createSelect(frame, items) {
 	return select;
 }
 
+function createInput(frame, placeholder) {
+	var input = NSTextField.alloc().initWithFrame(frame);
+	input.setPlaceholderString(placeholder);
+	return input;
+}
 
 function createCheckbox(frame, name, value, onstate, enabled) {
 	var checkbox = NSButton.alloc().initWithFrame(frame);

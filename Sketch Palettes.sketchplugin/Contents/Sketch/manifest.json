@@ -17,6 +17,13 @@
 			"handler": "loadPalette"
 		},
 		{
+			"name": "Load Palette From URL...",
+			"identifier": "loadPaletteUrl",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "loadPaletteUrl"
+		},
+		{
 			"name": "Save Palette...",
 			"identifier": "savePalette",
 			"shortcut": "",
@@ -34,6 +41,7 @@
 	"menu": {
 		"items": [
 			"loadPalette",
+			"loadPaletteUrl",
 			"savePalette",
 			"clearPalette"
 		]

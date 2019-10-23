@@ -1,7 +1,6 @@
 
 @import "util.js";
 
-
 //-------------------------------------------------------------------------------------------------------------
 // Save palette
 //-------------------------------------------------------------------------------------------------------------
@@ -207,9 +206,6 @@ function savePalette(context) {
 
 
 function loadPalette(context) {
-
-	var app = NSApp.delegate();
-	var doc = context.document;
 	var version = context.plugin.version().UTF8String();
 	var fileTypes = ["sketchpalette"];
 
@@ -311,9 +307,14 @@ function loadPalette(context) {
 
 			}
 		}
-
 	}
 
+	addColors(context, colorPalette, gradientPalette, imagePalette, colorAssets, gradientAssets, images);
+}
+
+function addColors(context, colorPalette, gradientPalette, imagePalette, colorAssets, gradientAssets, images) {
+	var doc = context.document;
+	var app = NSApp.delegate();
 	// Create dialog
 	var dialog = NSAlert.alloc().init();
 	dialog.setMessageText("Load Palette");
@@ -364,9 +365,68 @@ function loadPalette(context) {
 
 	doc.inspectorController().reload();
 	app.refreshCurrentDocument();
-
 }
 
+//-------------------------------------------------------------------------------------------------------------
+// Load palette URL
+//-------------------------------------------------------------------------------------------------------------
+
+function loadPaletteUrl(context) {
+	// Create dialog
+	var dialog = NSAlert.alloc().init();
+	dialog.setMessageText("Load URL");
+	dialog.addButtonWithTitle("Load");
+	dialog.addButtonWithTitle("Cancel");
+
+	// Create view to hold custom fields
+	var customView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 200, 180));
+
+	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'URL of website or API:');
+	customView.addSubview(labelSource);
+
+	var labelSource = createInput(NSMakeRect(0, 125, 200, 25), 'https://www.sketch.com');
+	customView.addSubview(labelSource);
+
+	// Add custom view to dialog
+	dialog.setAccessoryView(customView);
+
+	// Open dialog and exit if user hits cancel.
+	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
+
+	const data = fetch([labelSource.stringValue()]);
+
+	if( !data || data === '' || !data.length ) {
+		NSApp.displayDialog("No valid api!");
+	}
+
+	var colorList = data[0]
+		.match(/#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})/g)
+		.map(v => v.toLowerCase())
+		.filter((v, i, a) => a.indexOf(v) === i);
+		
+	var colorAssets = [];
+
+	// Colors Fills: convert rgba colors to MSColors
+	if (colorList.length) {
+		for (var i = 0; i < colorList.length; i++) {
+			var color = colorList[i];
+
+			if (color) {
+				var rgb = hexToRgb(color);
+				var mscolor = MSColor.colorWithRed_green_blue_alpha(
+					rgb[0] / 255,
+					rgb[1] / 255,
+					rgb[2] / 255,
+					1
+				);
+
+				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, color));
+			}
+		}
+	}
+
+	addColors(context, colorAssets, [], [], colorAssets, [], []);
+}
 
 //-------------------------------------------------------------------------------------------------------------
 // Clear palette
