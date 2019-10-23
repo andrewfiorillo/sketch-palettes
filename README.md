@@ -16,7 +16,7 @@ You can save palettes from either the Global presets section or from the Documen
 
 #### Loading Palettes
 
-Running the "Load Palette..." command in the plugin menu will allow you to choose a .sketchpalette file containg the presets you like to import. You can load palettes into either the Global presets section or into the Document presets section of the color picker. You can also select which of the available fill types you'd like to load. Fill presets will then be appended to the corresponding preset sections.
+Running the "Load Palette..." or "Load Palette from URL..." command in the plugin menu will allow you to choose a .sketchpalette file containg the presets you like to import. Running the "Load Palette from URL..." command in the plugin menu will allow you to scan colors used in a website (ex: https://www.sketch.com) or consume from an API or a Design System. You can load palettes into either the Global presets section or into the Document presets section of the color picker. You can also select which of the available fill types you'd like to load. Fill presets will then be appended to the corresponding preset sections.
 
 #### Removing Palettes
 

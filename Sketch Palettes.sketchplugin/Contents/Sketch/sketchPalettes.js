@@ -200,17 +200,12 @@ function savePalette(context) {
 }
 
 
-
-
 //-------------------------------------------------------------------------------------------------------------
 // Load palette
 //-------------------------------------------------------------------------------------------------------------
 
 
 function loadPalette(context) {
-
-	var app = NSApp.delegate();
-	var doc = context.document;
 	var version = context.plugin.version().UTF8String();
 	var fileTypes = ["sketchpalette"];
 
@@ -312,9 +307,14 @@ function loadPalette(context) {
 
 			}
 		}
-
 	}
 
+	addColors(context, colorPalette, gradientPalette, imagePalette, colorAssets, gradientAssets, images);
+}
+
+function addColors(context, colorPalette, gradientPalette, imagePalette, colorAssets, gradientAssets, images) {
+	var doc = context.document;
+	var app = NSApp.delegate();
 	// Create dialog
 	var dialog = NSAlert.alloc().init();
 	dialog.setMessageText("Load Palette");
@@ -365,56 +365,13 @@ function loadPalette(context) {
 
 	doc.inspectorController().reload();
 	app.refreshCurrentDocument();
-
 }
 
 //-------------------------------------------------------------------------------------------------------------
 // Load palette URL
 //-------------------------------------------------------------------------------------------------------------
 
-/**
- * Fetch JSON from a given URL
- */
-function networkRequest(args) {
-	var task = NSTask.alloc().init();
-	task.setLaunchPath("/usr/bin/curl");
-	task.setArguments(args);
-	var outputPipe = [NSPipe pipe];
-	[task setStandardOutput:outputPipe];
-	task.launch();
-	var responseData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
-	var responseString = [[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding]];
-	var parsed = tryParseJSON(responseString);
-	if(!parsed) {
-	  log("Error invoking curl");
-	  log("args:");
-	  log(args);
-	  log("responseString");
-	  log(responseString);
-	  throw "Error communicating with server"
-	}
-	return parsed;
-  }
-
-  function tryParseJSON (jsonString){
-  try {
-    var o = JSON.parse(jsonString);
-
-    // Handle non-exception-throwing cases:
-    // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
-    // but... JSON.parse(null) returns 'null', and typeof null === "object",
-    // so we must check for that, too.
-    if (o && typeof o === "object" && o !== null) {
-      return o;
-    }
-  }
-  catch (e) { }
-
-  return false;
-}
-
 function loadPaletteUrl(context) {
-
 	// Create dialog
 	var dialog = NSAlert.alloc().init();
 	dialog.setMessageText("Load URL");
@@ -424,7 +381,10 @@ function loadPaletteUrl(context) {
 	// Create view to hold custom fields
 	var customView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 200, 180));
 
-	var labelSource = createInput(NSMakeRect(0, 150, 200, 25), 12, false, 'Source:');
+	var labelSource = createLabel(NSMakeRect(0, 150, 200, 25), 12, false, 'URL of website or API:');
+	customView.addSubview(labelSource);
+
+	var labelSource = createInput(NSMakeRect(0, 125, 200, 25), 'https://www.sketch.com');
 	customView.addSubview(labelSource);
 
 	// Add custom view to dialog
@@ -433,39 +393,39 @@ function loadPaletteUrl(context) {
 	// Open dialog and exit if user hits cancel.
 	if (dialog.runModal() != NSAlertFirstButtonReturn) return;
 
-	const data = networkRequest([labelSource.stringValue()]);
+	const data = fetch([labelSource.stringValue()]);
 
-	if( !data || data === '' ) {
+	if( !data || data === '' || !data.length ) {
 		NSApp.displayDialog("No valid api!");
 	}
 
-	var colorPalette = Object.keys(data.colors);
+	var colorList = data[0]
+		.match(/#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})/g)
+		.map(v => v.toLowerCase())
+		.filter((v, i, a) => a.indexOf(v) === i);
+		
 	var colorAssets = [];
 
 	// Colors Fills: convert rgba colors to MSColors
-	if (colorPalette.length > 0) {
-		for (var i = 0; i < colorPalette.length; i++) {
-			var colorId = colorPalette[i];
-			var color = data.colors[colorId];
+	if (colorList.length) {
+		for (var i = 0; i < colorList.length; i++) {
+			var color = colorList[i];
 
 			if (color) {
+				var rgb = hexToRgb(color);
 				var mscolor = MSColor.colorWithRed_green_blue_alpha(
-					color.rgb.r / 255,
-					color.rgb.g / 255,
-					color.rgb.b / 255,
+					rgb[0] / 255,
+					rgb[1] / 255,
+					rgb[2] / 255,
 					1
 				);
 
-				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, color.name));
+				colorAssets.push(MSColorAsset.alloc().initWithAsset_name(mscolor, color));
 			}
 		}
 	}
 
-	// Get target picker section
-	var doc = context.document;
-	var assets = doc.documentData().assets();
-
-	if (colorAssets.length > 0) assets.addColorAssets(colorAssets);
+	addColors(context, colorAssets, [], [], colorAssets, [], []);
 }
 
 //-------------------------------------------------------------------------------------------------------------
